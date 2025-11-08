@@ -1,5 +1,5 @@
 #Replace token with new token
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYxMzk5NDQ3LCJ1c2VySWQiOiIxIn0.ZQ6VpKwjDewy9XTIFd8sIDWsaaW3BPkTeyxt3W_8Slg
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYyNzAxODI4LCJ1c2VySWQiOiIxIn0.XX97EWnLWmuEjAkVq0D4yEHKyfDYK3C5acneuoWKigA
 @token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYxMzk4NjY4LCJ1c2VySWQiOiIyIn0.0Js7xIPcglS40m_s6lRpE1hDSXC5_jW9kGiAqNXlQ4A
 
 ### get all users
@@ -41,9 +41,9 @@ POST http://127.0.0.1:8080/signup
 Content-Type: application/json
 
 {
-  "username": "Bart",
+  "username": "Bla",
   "password": "Test1",
-  "email": "test1@test.nl"
+  "email": "bla@test.nl"
 
 }
 ###
@@ -113,12 +113,12 @@ Authorization: Bearer {{token}}
 ### get the list of ingredients from your "fridge"
 GET http://127.0.0.1:8080/users/fridge
 Content-Type: application/json
-Authorization: Bearer {{token2}}
+Authorization: Bearer {{token}}
 
 ### post favorite item to user
 POST http://127.0.0.1:8080/users/fridge
 Content-Type: application/json
-Authorization: Bearer {{token2}}
+Authorization: Bearer {{token}}
 
 {
   "id": 2,
@@ -130,12 +130,12 @@ Authorization: Bearer {{token2}}
 ### get the list of allergens for signed in user
 GET http://127.0.0.1:8080/users/allergens
 Content-Type: application/json
-Authorization: Bearer {{token2}}
+Authorization: Bearer {{token}}
 
 ### post add or remove allergen for signed in user
 POST http://127.0.0.1:8080/users/allergens
 Content-Type: application/json
-Authorization: Bearer {{token2}}
+Authorization: Bearer {{token}}
 
 {
   "id": 1,

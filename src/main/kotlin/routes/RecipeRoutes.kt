@@ -4,12 +4,8 @@ import api.models.Diets
 import api.models.Ingredients
 import api.models.Recipes
 import api.repository.FakeRecipeRepository
-import api.repository.FakeRecipeRepository.recipes
-import api.repository.RecipesRepository
-import io.ktor.client.plugins.HttpCallValidator
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
-import io.ktor.server.http.httpDateFormat
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -21,19 +17,19 @@ import io.ktor.server.routing.route
 import service.RecipeService
 import service.requireAdmin
 
-fun Route.recipesRoutes(repository: RecipeService) {
+fun Route.recipesRoutes() {
 
     route("/recipes") {
 
         // Get all recipes
         get {
-            call.respond(repository.findAll())
+            call.respond(FakeRecipeRepository.findAll())
         }
         authenticate {
             post {
                 if(call.requireAdmin()){
                     val request = call.receive<Recipes>()
-                    val created = repository.create(request)
+                    val created = FakeRecipeRepository.create(request)
                     call.respond(HttpStatusCode.Created, created)
                 } else {
                     call.respond(HttpStatusCode.Unauthorized)
@@ -45,7 +41,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
         //Get recipes by title
         get("/title/{title}") {
             val name = call.parameters["title"].toString()
-            val title = repository.findByTitle(name)
+            val title = FakeRecipeRepository.findByTitle(name)
             if (title == null) {
                 call.respond(HttpStatusCode.NotFound, "Recipe not found.")
             } else {
@@ -61,7 +57,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
                 call.respond(HttpStatusCode.BadRequest)
             }
 
-            val recipes = repository.findByMealType(type)
+            val recipes = FakeRecipeRepository.findByMealType(type)
 
             if (recipes.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "No recipes found for meal type $type.")
@@ -78,7 +74,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
                 call.respond(HttpStatusCode.BadRequest)
             }
 
-            val difficulty = repository.findByDifficulty(diff)
+            val difficulty = FakeRecipeRepository.findByDifficulty(diff)
 
             if (difficulty.isEmpty()) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid difficulty level '$difficulty'.")
@@ -101,7 +97,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
                 return@get
             }
 
-            val dietsChoice = repository.findByDiets(diets)
+            val dietsChoice = FakeRecipeRepository.findByDiets(diets)
 
             if (dietsChoice.isEmpty()) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid diet choice '$diets'")
@@ -119,7 +115,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
                 return@get
             }
 
-            val recipes = repository.findByKitchenStyle(style)
+            val recipes = FakeRecipeRepository.findByKitchenStyle(style)
 
             if (recipes.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "No recipes found for kitchen style '$style'.")
@@ -137,7 +133,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
 
             // controleert of de user met 'id' bestaat
 //                val recipe = FakeRecipeRepository.recipeService.findById(id)
-            val recipe = repository.findById(id)
+            val recipe = FakeRecipeRepository.findById(id)
                 ?: return@get call.respond(HttpStatusCode.NotFound)
 
             call.respond(HttpStatusCode.OK, recipe)
@@ -149,7 +145,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
                     val id: Long = call.parameters["id"]?.toLongOrNull()
                         ?: return@delete call.respond(HttpStatusCode.BadRequest)
 
-                    val succes = repository.delete(id)
+                    val succes = FakeRecipeRepository.delete(id)
                     if (succes) {
                         call.respond(HttpStatusCode.OK, "Recipe with id: $id succesfully deleted.")
                     } else {
@@ -179,7 +175,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
                     val updatedRecipe = request.copy(id = id)
 
                     try {
-                        repository.update(updatedRecipe)
+                        FakeRecipeRepository.update(updatedRecipe)
                         call.respond(HttpStatusCode.OK, updatedRecipe)
                     } catch (e: IllegalArgumentException) {
                         call.respond(HttpStatusCode.NotFound, e.message ?: "Recipe not found")
@@ -198,7 +194,7 @@ fun Route.recipesRoutes(repository: RecipeService) {
 
             val foundRecipes = mutableListOf<Recipes>()
 
-            for (recipe in recipes) {
+            for (recipe in FakeRecipeRepository.recipes) {
                 for(ingredientUnit in recipe.ingredients) {
                     if(ingredientUnit.ingredient.name == ingredient.name){
                         foundRecipes.add(recipe)

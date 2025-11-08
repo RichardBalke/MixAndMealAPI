@@ -2,7 +2,7 @@ package api.routes
 
 import api.models.Allergens
 import api.models.Ingredients
-import api.repository.IngredientsRepository
+import api.repository.FakeIngredientsRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
@@ -15,13 +15,13 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 
-fun Route.ingredientsRoutes(repository: IngredientsRepository) {
+fun Route.ingredientsRoutes() {
 
     route("/ingredients") {
 
         // GET all ingredients
         get {
-            call.respond(repository.findAll())
+            call.respond(FakeIngredientsRepository.findAll())
         }
 
 
@@ -32,7 +32,7 @@ fun Route.ingredientsRoutes(repository: IngredientsRepository) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid ID")
                 return@get
             }
-            val ingredient = repository.findById(id)
+            val ingredient = FakeIngredientsRepository.findById(id)
             if (ingredient == null) {
                 call.respond(HttpStatusCode.NotFound, "Ingredient not found")
             } else {
@@ -43,7 +43,7 @@ fun Route.ingredientsRoutes(repository: IngredientsRepository) {
         // GET by name
         get("/name/{name}") {
             val name = call.parameters["name"]
-            val ingredient = name?.let { repository.findByName(it) }
+            val ingredient = name?.let { FakeIngredientsRepository.findByName(it) }
             if (ingredient == null) {
                 call.respond(HttpStatusCode.NotFound, "Ingredient not found")
             } else {
@@ -55,14 +55,14 @@ fun Route.ingredientsRoutes(repository: IngredientsRepository) {
             // POST create
             post {
                 val request = call.receive<Ingredients>()
-                val created = repository.create(request)
+                val created = FakeIngredientsRepository.create(request)
                 call.respond(HttpStatusCode.Created, created)
             }
 
             // PUT update full ingredient
             put {
                 val request = call.receive<Ingredients>()
-                repository.update(request)
+                FakeIngredientsRepository.update(request)
                 call.respond(HttpStatusCode.OK, "Ingredient updated")
             }
 
@@ -70,14 +70,14 @@ fun Route.ingredientsRoutes(repository: IngredientsRepository) {
             patch("/{id}/allergens") {
                 val id = call.parameters["id"]?.toLongOrNull()
                 val newAllergens = call.receive<List<Allergens>>()
-                val ingredient = id?.let { repository.findById(it) }
+                val ingredient = id?.let { FakeIngredientsRepository.findById(it) }
 
                 if (ingredient == null) {
                     call.respond(HttpStatusCode.NotFound, "Ingredient not found")
                     return@patch
                 }
 
-                val updated = repository.updateAllergens(ingredient, newAllergens)
+                val updated = FakeIngredientsRepository.updateAllergens(ingredient, newAllergens)
                 call.respond(updated)
             }
 
@@ -88,7 +88,7 @@ fun Route.ingredientsRoutes(repository: IngredientsRepository) {
                     call.respond(HttpStatusCode.BadRequest, "Invalid ID")
                     return@delete
                 }
-                val success = repository.delete(id)
+                val success = FakeIngredientsRepository.delete(id)
                 if (success) {
                     call.respond(HttpStatusCode.OK, "Ingredient deleted")
                 } else {

@@ -3,7 +3,6 @@ package api.repository
 
 import api.models.IngredientUnits
 import api.models.Ingredients
-import api.service.IngredientService
 import kotlinx.coroutines.runBlocking
 import kotlin.math.E
 
@@ -14,7 +13,7 @@ interface IngredientUnitRepository {
 object FakeIngredientUnitRepository : IngredientUnitRepository {
 
     val list = mutableListOf<IngredientUnits>()
-    val ingredientService = IngredientService()
+
 
     init {
         runBlocking {
@@ -29,7 +28,7 @@ object FakeIngredientUnitRepository : IngredientUnitRepository {
 
     suspend fun create(id: Long, amount: Double, unitType: String): IngredientUnits? {
 
-        val findIngredient = ingredientService.findById(id)
+        val findIngredient = FakeIngredientsRepository.findById(id)
         if (findIngredient == null) {
             IllegalArgumentException()
             return null
