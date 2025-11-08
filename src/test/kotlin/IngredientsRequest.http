@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYyNzAxODI4LCJ1c2VySWQiOiIxIn0.XX97EWnLWmuEjAkVq0D4yEHKyfDYK3C5acneuoWKigA
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYyNzEyMzA2LCJ1c2VySWQiOiI1In0.G1rlUzM_sA8EEiydXYN1PB8LA9-xCUAdYo4NAXL81vM
 ### Get all ingredients
 GET http://localhost:8080/ingredients
 Accept: application/json
@@ -6,7 +6,7 @@ Accept: application/json
 ###
 
 ### Get ingredient by ID
-GET http://localhost:8080/ingredients/1
+GET http://localhost:8080/ingredients/3
 Accept: application/json
 
 ###
@@ -50,8 +50,12 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 [
-  "PEANUTS",
-  "SOY"
+{
+  "id": 1,
+  "name":"GLUTEN",
+  "displayName":"Glutenbevattende granen",
+  "description": "Bevat gluten uit tarwe, rogge, gerst, haver, spelt of kamut"
+}
 ]
 
 ###

@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYxNDIyMTc0LCJ1c2VySWQiOiIxIn0.nN4MNonUl1kzdHrrqHZqQDNib4fMMX7sFJEOhoIlZ14
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYyNzAxODI4LCJ1c2VySWQiOiIxIn0.XX97EWnLWmuEjAkVq0D4yEHKyfDYK3C5acneuoWKigA
 
 ### Create a new recipe
 POST http://localhost:8080/recipes
@@ -79,7 +79,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### Update recipe
-PUT http://localhost:8080/recipes/1
+PUT http://localhost:8080/recipes/2
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

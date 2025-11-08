@@ -1,4 +1,4 @@
-@token = PUT_TOKEN_HERE_TO_TEST
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYyNzEyMzA2LCJ1c2VySWQiOiI1In0.G1rlUzM_sA8EEiydXYN1PB8LA9-xCUAdYo4NAXL81vM
 
 ### Signup as a new user
 POST http://127.0.0.1:8080/signup
