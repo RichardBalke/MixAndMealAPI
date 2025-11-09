@@ -64,10 +64,7 @@ fun Route.userRoutes() {
                 val user = FakeUserRepository.findById(userId)
                     ?: return@post call.respond(HttpStatusCode.NotFound, "user not found")
 
-                val request = call.receiveNullable<Recipes>() ?: kotlin.run{
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@post
-                }
+                val request = call.receiveNullable<Recipes>() ?: return@post call.respond(HttpStatusCode.BadRequest)
 
                 if(user.favourites.any{it.id == request.id }) {
                     user.favourites.remove(request)
@@ -98,10 +95,7 @@ fun Route.userRoutes() {
                 val user = FakeUserRepository.findById(userId)
                     ?: return@post call.respond(HttpStatusCode.NotFound, "user not found")
 
-                val request = call.receiveNullable<Ingredients>() ?: kotlin.run{
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@post
-                }
+                val request = call.receiveNullable<Ingredients>() ?: return@post call.respond(HttpStatusCode.BadRequest)
 
                 if(user.fridge.any{it.id == request.id }) {
                     user.fridge.remove(request)
@@ -132,10 +126,7 @@ fun Route.userRoutes() {
                 val user = FakeUserRepository.findById(userId)
                     ?: return@post call.respond(HttpStatusCode.NotFound, "user not found")
 
-                val request = call.receiveNullable<Allergens>() ?: kotlin.run{
-                    call.respond(HttpStatusCode.Forbidden, "Allergen is not correct")
-                    return@post
-                }
+                val request = call.receiveNullable<Allergens>() ?: return@post call.respond(HttpStatusCode.Forbidden, "Allergen is not correct")
 
                 if(user.allergens.any{it.id == request.id }) {
                     user.allergens.remove(request)
