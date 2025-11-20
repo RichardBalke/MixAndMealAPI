@@ -6,7 +6,6 @@ import api.repository.RecipesRepository
 import api.repository.FakeRecipeRepository.currentID
 import api.repository.FakeRecipeRepository.recipes
 import api.models.Recipes
-import api.repository.FakeUserRepository.users
 
 
 class RecipeService {

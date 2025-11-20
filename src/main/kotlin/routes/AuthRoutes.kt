@@ -1,7 +1,7 @@
 package routes
 
 import api.models.User
-import api.repository.FakeUserRepository
+import api.repository.UserRepositoryImpl
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -20,6 +20,7 @@ import service.requireAdmin
 
 
 fun Route.signUp(){
+    val userRepo = UserRepositoryImpl()
     post("/signup"){
         val request = call.receiveNullable<AuthRequest>() ?: kotlin.run{
             call.respond(HttpStatusCode.BadRequest)
@@ -34,16 +35,19 @@ fun Route.signUp(){
             return@post
         }
 
-        if(FakeUserRepository.findByEmail(request.email) != null){
+        if(userRepo.findByEmail(request.email) != null){
             call.respond(HttpStatusCode.Conflict, "User already exists")
         }
 
+        val userCount = userRepo.findAll().count()
+
         val user = User(
+            id = userCount + 1,
             name = request.username,
             password = request.password,
             email = request.email,
         )
-        FakeUserRepository.create(user)
+        userRepo.create(user)
 
         call.respond(HttpStatusCode.OK)
 
@@ -54,13 +58,14 @@ fun Route.signIn(
     tokenService: JwtService,
     tokenConfig : TokenConfig
 ){
+    val userRepo = UserRepositoryImpl()
     post("/signin"){
         val request = call.receiveNullable<AuthRequest>() ?: kotlin.run{
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
-        val user = FakeUserRepository.findByUsername(request.username)
+        val user = userRepo.findByUsername(request.username)
         if(user == null){
             call.respond(HttpStatusCode.Unauthorized)
             return@post

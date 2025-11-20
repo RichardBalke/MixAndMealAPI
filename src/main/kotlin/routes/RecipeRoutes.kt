@@ -158,35 +158,35 @@ fun Route.recipesRoutes() {
 
             }
 
-            put("/{id}") {
-                if(call.requireAdmin()){
-                    val id = call.parameters["id"]?.toLongOrNull()
-                        ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid ID format")
-
-                    val request = try {
-                        call.receive<Recipes>()
-                    } catch (e: Exception) {
-                        return@put call.respond(
-                            HttpStatusCode.BadRequest,
-                            "Invalid request body: ${e.message ?: "malformed JSON"}"
-                        )
-                    }
-
-                    val updatedRecipe = request.copy(id = id)
-
-                    try {
-                        FakeRecipeRepository.update(updatedRecipe)
-                        call.respond(HttpStatusCode.OK, updatedRecipe)
-                    } catch (e: IllegalArgumentException) {
-                        call.respond(HttpStatusCode.NotFound, e.message ?: "Recipe not found")
-                    } catch (e: Exception) {
-                        call.respond(HttpStatusCode.InternalServerError, "Update failed: ${e.message}")
-                    }
-                } else {
-                    call.respond(HttpStatusCode.Unauthorized)
-                }
-
-            }
+//            put("/{id}") {
+//                if(call.requireAdmin()){
+//                    val id = call.parameters["id"]?.toLongOrNull()
+//                        ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid ID format")
+//
+//                    val request = try {
+//                        call.receive<Recipes>()
+//                    } catch (e: Exception) {
+//                        return@put call.respond(
+//                            HttpStatusCode.BadRequest,
+//                            "Invalid request body: ${e.message ?: "malformed JSON"}"
+//                        )
+//                    }
+//
+//                    val updatedRecipe = request.copy(id = id)
+//
+//                    try {
+//                        FakeRecipeRepository.update(updatedRecipe)
+//                        call.respond(HttpStatusCode.OK, updatedRecipe)
+//                    } catch (e: IllegalArgumentException) {
+//                        call.respond(HttpStatusCode.NotFound, e.message ?: "Recipe not found")
+//                    } catch (e: Exception) {
+//                        call.respond(HttpStatusCode.InternalServerError, "Update failed: ${e.message}")
+//                    }
+//                } else {
+//                    call.respond(HttpStatusCode.Unauthorized)
+//                }
+//
+//            }
 
         }
         post("/ingredient"){

@@ -43,11 +43,12 @@ object FakeIngredientsRepository : IngredientsRepository {
         return ingredients.removeIf { id == it.id }
     }
 
-    override suspend fun update(entity: Ingredients) {
+    override suspend fun update(id: Long, entity: Ingredients): Ingredients {
         check(entity.id > 0) { "ID must be greater than 0." }
         require(ingredients.any { it.id == entity.id })
         ingredients.removeIf { entity.id == it.id }
         ingredients.add(entity)
+        return entity
     }
 
     override suspend fun findByName(name: String): Ingredients?{

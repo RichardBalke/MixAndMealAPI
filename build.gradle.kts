@@ -24,6 +24,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth-jwt")
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("com.h2database:h2:$h2_version")
     implementation("io.ktor:ktor-server-netty")
     implementation("ch.qos.logback:logback-classic:$logback_version")
@@ -38,6 +39,8 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.11")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation(kotlin("test"))
+
+    implementation("org.postgresql:postgresql:42.7.2")
 }
 
 tasks.test {

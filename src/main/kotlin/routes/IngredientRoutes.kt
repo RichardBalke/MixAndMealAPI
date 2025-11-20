@@ -60,11 +60,11 @@ fun Route.ingredientsRoutes() {
             }
 
             // PUT update full ingredient
-            put {
-                val request = call.receive<Ingredients>()
-                FakeIngredientsRepository.update(request)
-                call.respond(HttpStatusCode.OK, "Ingredient updated")
-            }
+//            put {
+//                val request = call.receive<Ingredients>()
+//                FakeIngredientsRepository.update(request)
+//                call.respond(HttpStatusCode.OK, "Ingredient updated")
+//            }
 
             // PATCH update allergens
             patch("/{id}/allergens") {

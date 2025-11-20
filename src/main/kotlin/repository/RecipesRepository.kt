@@ -157,10 +157,11 @@ object FakeRecipeRepository : RecipesRepository {
         return recipes.removeIf { id == it.id}
     }
 
-    override suspend fun update(entity: Recipes) {
+    override suspend fun update(id: Long, entity: Recipes): Recipes {
         check(entity.id > 0) { "ID must be greater than 0." }
         val index = recipes.indexOfFirst { it.id == entity.id }
         require(index != -1) { "Recipe with ID ${entity.id} not found." }
         recipes[index] = entity
+        return entity
     }
 }

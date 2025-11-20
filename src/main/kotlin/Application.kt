@@ -1,7 +1,9 @@
 package api
 
+import api.repository.UserRepositoryImpl
 import io.ktor.server.application.*
 import models.TokenConfig
+import org.jetbrains.exposed.sql.Database
 import service.JwtService
 
 fun main(args: Array<String>) {
@@ -18,10 +20,17 @@ fun Application.module() {
         secret = System.getenv("JWT_SECRET")
     )
 
-
     configureSerialization()
     configureSecurity(tokenConfig)
-    // Database will be implemented in the new version.
-//    configureDatabases()
+    initDatabase()
     configureRouting(tokenService, tokenConfig)
+}
+
+fun initDatabase() {
+    Database.connect(
+        url = "jdbc:postgresql://localhost:5432/postgres",
+        driver = "org.postgresql.Driver",
+        user = "postgres",
+        password = "admin"
+    )
 }
