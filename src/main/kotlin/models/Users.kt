@@ -11,20 +11,10 @@ data class User(
     val password: String,
     val role: Role = Role.USER
 
-//    val locationSettings: LocationSettings(), wordt toegevoegd bij implementatie app
-
-//    val favourites: MutableList<Recipes> = mutableListOf<Recipes>(),
-//    val fridge: MutableList<Ingredients> = mutableListOf<Ingredients>(),
-//    val allergens: MutableList<Allergens> = mutableListOf<Allergens>(),
 )
-// {
-//    companion object {
-//        const val NEW_USER_ID: Long = 0L
-//    }
-//}
 
-object Users: Table(){
-    val user_id = integer("user_id").uniqueIndex()
+object Users: Table() {
+    val user_id = integer("user_id").autoIncrement().uniqueIndex()
     val name = varchar("name", 255)
     val email = varchar("email", 255)
     val password = varchar("password", 255)
