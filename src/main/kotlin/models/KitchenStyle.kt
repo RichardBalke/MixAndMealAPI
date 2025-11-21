@@ -3,7 +3,7 @@ package api.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class KitchenStyle(kitchenName: String?) {
+enum class KitchenStyle(kitchenName: String) {
     ASIAN("asian"),
     EAST_EUROPEAN("easteuropean"),
     MEXICAN("mexican"),
