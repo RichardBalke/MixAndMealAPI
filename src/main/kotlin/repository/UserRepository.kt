@@ -7,27 +7,27 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 
-interface UserRepository : CrudRepository<User, Int> {
+interface UserRepository {
     suspend fun findByUsername(username: String): User?
     suspend fun findByEmail(email: String): User?
-    suspend fun getRoleById(id: Int): Role
+    suspend fun getRoleById(id: String): Role
 }
 
-class UserRepositoryImpl : CrudImplementation<User, Int>(
+class UserRepositoryImpl : UserRepository, CrudImplementation<User, String>(
     table = Users,
     toEntity = { row ->
         val roleString = row[Users.role]
         val roleEnum = Role.valueOf(roleString)
-        User(row[Users.user_id], row[Users.name], row[Users.email], row[Users.password], roleEnum) },
-    idColumn = Users.user_id,
+        User(row[Users.name], row[Users.email], row[Users.password], roleEnum) },
+    idColumns = listOf(Users.email),
+    idExtractor = {listOf(Users.email)},
     entityMapper = { stmt, user ->
-        stmt[Users.user_id] = user.id
         stmt[Users.name] = user.name
         stmt[Users.email] = user.email
         stmt[Users.password] = user.password
         stmt[Users.role] = user.role.name
     }
-), UserRepository {
+) {
     override suspend fun findByUsername(username: String): User? = transaction {
         Users.selectAll()
             .where { Users.name eq username }
@@ -41,10 +41,10 @@ class UserRepositoryImpl : CrudImplementation<User, Int>(
             .singleOrNull()
     }
 
-    override suspend fun getRoleById(id: Int): Role {
+    override suspend fun getRoleById(id: String): Role {
         val user = transaction {
             Users.selectAll()
-                .where { Users.user_id eq id }
+                .where { Users.email eq id }
                 .mapNotNull(toEntity)
                 .single()
         }

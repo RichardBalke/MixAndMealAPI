@@ -1,17 +1,10 @@
 package api.repository
 
-import api.models.Diets
 import api.models.Difficulty
-import api.models.IngredientUnits
 import api.models.KitchenStyle
 import api.models.MealType
 import api.models.Recipe
 import api.models.Recipes
-import api.models.Role
-import api.models.User
-import api.models.Users
-import kotlinx.coroutines.runBlocking
-import api.repository.FakeIngredientUnitRepository.list
 
 interface RecipesRepository : CrudRepository<Recipe, Int> {
     suspend fun findByTitle(title: String): List<Recipe>
@@ -32,8 +25,8 @@ class RecipesRepositoryImpl : CrudImplementation<Recipe, Int>(
         val difficultyEnum = Difficulty.valueOf(difficultyString)
         val mealTypeString = row[Recipes.mealType]
         val mealTypeEnum = MealType.valueOf(mealTypeString)
-        val kitcheStyleString = row[Recipes.kitchenStyle]
-        val kitcheStyleEnum = KitchenStyle.valueOf(kitcheStyleString)
+        val kitchenStyleString = row[Recipes.kitchenStyle]
+        val kitchenStyleEnum = KitchenStyle.valueOf(kitchenStyleString)
         Recipe(row[Recipes.id],
             row[Recipes.title],
             row[Recipes.description],
@@ -42,8 +35,9 @@ class RecipesRepositoryImpl : CrudImplementation<Recipe, Int>(
             difficultyEnum,
             row[Recipes.image],
             mealTypeEnum,
-            kitcheStyleEnum) },
-    idColumn = Recipes.id,
+            kitchenStyleEnum) },
+    idColumns = listOf(Recipes.id),
+    idExtractor =  { listOf(Recipes.id) },
     entityMapper = { stmt, recipe ->
         stmt[Recipes.id] = recipe.id
         stmt[Recipes.title] = recipe.title
@@ -55,6 +49,7 @@ class RecipesRepositoryImpl : CrudImplementation<Recipe, Int>(
         stmt[Recipes.mealType] = recipe.mealType.name
         stmt[Recipes.kitchenStyle] = recipe.kitchenStyle.name
     }), RecipesRepository {
+
     override suspend fun findByTitle(title: String): List<Recipe> {
         TODO("Not yet implemented")
     }

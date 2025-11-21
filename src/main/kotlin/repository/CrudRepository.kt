@@ -1,9 +1,11 @@
 package api.repository
 
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
@@ -19,35 +21,43 @@ interface CrudRepository <T,ID> {
     suspend fun delete(id: ID): Boolean
 }
 
-abstract class CrudImplementation<T : Any,ID : Any>(
-    private val table : Table,
+abstract class CrudImplementation<T : Any, ID : Any>(
+    private val table: Table,
     protected val toEntity: (ResultRow) -> T,
-    private val idColumn: Column<ID>,
+    private val idColumns: List<Column<*>>, // List instead of single column
+    private val idExtractor: (ID) -> List<Any>, // Extracts PK values from ID
     private val entityMapper: (UpdateBuilder<*>, T) -> Unit
 ) : CrudRepository<T, ID> {
 
+    // Helper to build composite WHERE clause
+    private fun compositeEq(id: ID): Op<Boolean> {
+        val values = idExtractor(id)
+        return idColumns
+            .zip(values)
+            .map { (col, value) -> col as Column<Any> eq value }
+            .reduce { acc, op -> acc and op }
+    }
+
     override suspend fun findById(id: ID): T? = transaction {
         table.selectAll()
-            .where { idColumn eq id }
+            .where { compositeEq(id) }
             .mapNotNull(toEntity)
             .singleOrNull()
     }
 
     override suspend fun findAll(): List<T> = transaction {
-        table.selectAll().map(toEntity)
+        table.selectAll()
+            .map(toEntity)
     }
 
     override suspend fun update(id: ID, entity: T): T = transaction {
-        // Perform update with where clause targeting entity id
-        val updatedRows = table.update({ idColumn eq id }) {
+        val updatedRows = table.update({ compositeEq(id) }) {
             entityMapper(it, entity)
         }
-        // Optionally, check if update happened
         require(updatedRows > 0) { "No rows updated" }
-
-        // Fetch updated entity from DB (could be a select by id)
         val updatedEntityRow = table.selectAll()
-            .where { idColumn eq id }.single()
+            .where { compositeEq(id) }
+            .single()
         toEntity(updatedEntityRow)
     }
 
@@ -59,7 +69,7 @@ abstract class CrudImplementation<T : Any,ID : Any>(
     }
 
     override suspend fun delete(id: ID): Boolean = transaction {
-        table.deleteWhere { idColumn eq id } > 0
+        table.deleteWhere { compositeEq(id) } > 0
     }
 }
 

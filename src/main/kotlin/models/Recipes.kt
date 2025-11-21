@@ -28,7 +28,7 @@ object Recipes : Table() {
     val cookingTime = integer("cookingTime")
     val difficulty = varchar("difficulty", 255)
     val image = varchar("image", 255)
-    val mealType = varchar("mealtype", 255).nullable()
-    val kitchenStyle = varchar("kitchen_style", 255).nullable()
+    val mealType = varchar("mealtype", 255)
+    val kitchenStyle = varchar("kitchen_style", 255)
 }
 
