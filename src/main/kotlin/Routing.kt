@@ -1,6 +1,5 @@
 package api
 
-import api.repository.FakeIngredientsRepository
 import api.routes.ingredientsRoutes
 import api.routes.userRoutes
 import api.routes.recipesRoutes
@@ -13,8 +12,6 @@ import routes.getSecretInfo
 import routes.signIn
 import routes.signUp
 import service.JwtService
-import service.RecipeService
-import service.TokenService
 
 fun Application.configureRouting(
     tokenService: JwtService,
