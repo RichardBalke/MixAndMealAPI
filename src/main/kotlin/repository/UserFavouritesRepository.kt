@@ -1,23 +1,23 @@
 package repository
 
-import api.models.UserFavouriteEntry
+import api.models.UserFavouritesEntry
 import api.models.UserFavourites
 import api.repository.CrudImplementation
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface UserFavouritesRepository {
-    suspend fun getFavouritesForUser(userId: String): List<UserFavouriteEntry>
-    suspend fun addFavourite(userId: String, recipeId: Int): UserFavouriteEntry
+    suspend fun getFavouritesForUser(userId: String): List<UserFavouritesEntry>
+    suspend fun addFavourite(userId: String, recipeId: Int): UserFavouritesEntry
     suspend fun removeFavourite(userId: String, recipeId: Int)
 }
 
 class UserFavouritesRepositoryImpl :
     UserFavouritesRepository,
-    CrudImplementation<UserFavouriteEntry, UserFavouriteEntry>(
+    CrudImplementation<UserFavouritesEntry, UserFavouritesEntry>(
         table = UserFavourites,
         toEntity = { row ->
-            UserFavouriteEntry(
+            UserFavouritesEntry(
                 userId = row[UserFavourites.userId],
                 recipeId = row[UserFavourites.recipeId]
             )
@@ -30,18 +30,18 @@ class UserFavouritesRepositoryImpl :
         }
     ) {
 
-    override suspend fun getFavouritesForUser(userId: String): List<UserFavouriteEntry> = transaction {
+    override suspend fun getFavouritesForUser(userId: String): List<UserFavouritesEntry> = transaction {
         UserFavourites
             .select(UserFavourites.userId eq userId)
             .map(toEntity)
     }
 
-    override suspend fun addFavourite(userId: String, recipeId: Int): UserFavouriteEntry {
-        val entry = UserFavouriteEntry(userId, recipeId)
+    override suspend fun addFavourite(userId: String, recipeId: Int): UserFavouritesEntry {
+        val entry = UserFavouritesEntry(userId, recipeId)
         return create(entry)
     }
 
     override suspend fun removeFavourite(userId: String, recipeId: Int) {
-        delete(UserFavouriteEntry(userId, recipeId))
+        delete(UserFavouritesEntry(userId, recipeId))
     }
 }

@@ -6,7 +6,7 @@ import api.models.Users
 import api.models.Recipes
 
 @Serializable
-data class UserFavouriteEntry(
+data class UserFavouritesEntry(
     val userId: String,
     val recipeId: Int
 )
