@@ -8,8 +8,8 @@ import api.models.Recipes
 
 interface RecipesRepository : CrudRepository<Recipe, Int> {
     suspend fun findByTitle(title: String): List<Recipe>
-    suspend fun findByDifficulty(difficulty: String): List<Recipe>
-    suspend fun findByMealType(mealType: String): List<Recipe>
+    suspend fun findByDifficulty(difficulty: String?): List<Recipe>
+    suspend fun findByMealType(mealType: String?): List<Recipe>
     suspend fun findByDiets(diets: String): List<Recipe>
     suspend fun findByKitchenStyle(kitchenStyle: String): List<Recipe>
 
@@ -54,11 +54,11 @@ class RecipesRepositoryImpl : CrudImplementation<Recipe, Int>(
         TODO("Not yet implemented")
     }
 
-    override suspend fun findByDifficulty(difficulty: String): List<Recipe> {
+    override suspend fun findByDifficulty(difficulty: String?): List<Recipe> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun findByMealType(mealType: String): List<Recipe> {
+    override suspend fun findByMealType(mealType: String?): List<Recipe> {
         TODO("Not yet implemented")
     }
 

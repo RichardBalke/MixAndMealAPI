@@ -42,7 +42,6 @@ fun Route.signUp(){
         val userCount = userRepo.findAll().count()
 
         val user = User(
-            id = userCount + 1,
             name = request.username,
             password = request.password,
             email = request.email,
@@ -82,7 +81,7 @@ fun Route.signIn(
             config = tokenConfig,
             TokenClaim(
                 name = "userId",
-                value = user.id.toString()
+                value = user.email
             )
         )
         call.respond(status = HttpStatusCode.OK,

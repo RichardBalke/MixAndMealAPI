@@ -22,15 +22,15 @@ interface CrudRepository <T,ID> {
 }
 
 abstract class CrudImplementation<T : Any, ID : Any>(
-    private val table: Table,
+    protected val table: Table,
     protected val toEntity: (ResultRow) -> T,
-    private val idColumns: List<Column<*>>, // List instead of single column
-    private val idExtractor: (ID) -> List<Any>, // Extracts PK values from ID
-    private val entityMapper: (UpdateBuilder<*>, T) -> Unit
+    protected val idColumns: List<Column<*>>, // List instead of single column
+    protected val idExtractor: (ID) -> List<Any>, // Extracts PK values from ID
+    protected val entityMapper: (UpdateBuilder<*>, T) -> Unit
 ) : CrudRepository<T, ID> {
 
     // Helper to build composite WHERE clause
-    private fun compositeEq(id: ID): Op<Boolean> {
+    protected fun compositeEq(id: ID): Op<Boolean> {
         val values = idExtractor(id)
         return idColumns
             .zip(values)

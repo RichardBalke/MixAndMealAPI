@@ -1,9 +1,10 @@
 package api.routes
 
-import api.models.Diets
-import api.models.Ingredients
-import api.models.Recipes
-import api.repository.FakeRecipeRepository
+import api.models.Diet
+import api.models.Ingredient
+import api.models.Recipe
+import api.repository.IngredientUnitRepositoryImpl
+import api.repository.RecipesRepositoryImpl
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
@@ -12,24 +13,22 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.routing.put
 import io.ktor.server.routing.route
-import service.RecipeService
 import service.requireAdmin
 
 fun Route.recipesRoutes() {
-
+    val recipeRepo = RecipesRepositoryImpl()
     route("/recipes") {
 
         // Get all recipes
         get {
-            call.respond(FakeRecipeRepository.findAll())
+            call.respond(recipeRepo.findAll())
         }
         authenticate {
             post {
                 if(call.requireAdmin()){
-                    val request = call.receive<Recipes>()
-                    val created = FakeRecipeRepository.create(request)
+                    val request = call.receive<Recipe>()
+                    val created = recipeRepo.create(request)
                     call.respond(HttpStatusCode.Created, created)
                 } else {
                     call.respond(HttpStatusCode.Unauthorized)
@@ -41,7 +40,7 @@ fun Route.recipesRoutes() {
         //Get recipes by title
         get("/title/{title}") {
             val name = call.parameters["title"].toString()
-            val title = FakeRecipeRepository.findByTitle(name)
+            val title = recipeRepo.findByTitle(name)
             if (title == null) {
                 call.respond(HttpStatusCode.NotFound, "Recipe not found.")
             } else {
@@ -50,102 +49,103 @@ fun Route.recipesRoutes() {
         }
 
         //Get by mealtype
-        get("/mealtype/{mealtype}") {
-            val type = call.parameters["mealtype"]?.lowercase()
-
-            if (type == null) {
-                call.respond(HttpStatusCode.BadRequest)
-            }
-
-            val recipes = FakeRecipeRepository.findByMealType(type)
-
-            if (recipes.isEmpty()) {
-                call.respond(HttpStatusCode.NotFound, "No recipes found for meal type $type.")
-            } else {
-                call.respond(recipes)
-            }
-        }
+//        get("/mealtype/{mealtype}") {
+//            val type = call.parameters["mealtype"]?.lowercase()
+//
+//            if (type == null) {
+//                call.respond(HttpStatusCode.BadRequest)
+//            }
+//
+//            val recipes = recipeRepo.findByMealType(type)
+//
+//            if (recipes.isEmpty()) {
+//                call.respond(HttpStatusCode.NotFound, "No recipes found for meal type $type.")
+//            } else {
+//                call.respond(recipes)
+//            }
+//        }
 
         //Get by difficulty
-        get("/difficulty/{difficulty}") {
-            val diff = call.parameters["difficulty"]?.lowercase()
-
-            if (diff == null) {
-                call.respond(HttpStatusCode.BadRequest)
-            }
-
-            val difficulty = FakeRecipeRepository.findByDifficulty(diff)
-
-            if (difficulty.isEmpty()) {
-                call.respond(HttpStatusCode.BadRequest, "Invalid difficulty level '$difficulty'.")
-            } else {
-                call.respond(difficulty)
-            }
-        }
+//        get("/difficulty/{difficulty}") {
+//            val diff = call.parameters["difficulty"]?.lowercase()
+//
+//            if (diff == null) {
+//                call.respond(HttpStatusCode.BadRequest)
+//            }
+//
+//            val difficulty = recipeRepo.findByDifficulty(diff)
+//
+//            if (difficulty.isEmpty()) {
+//                call.respond(HttpStatusCode.BadRequest, "Invalid difficulty level '$difficulty'.")
+//            } else {
+//                call.respond(difficulty)
+//            }
+//        }
 
         //Get by diets
-        get("/diets/{diet}") {
-            fun String?.isValidDietDisplayName(): Boolean {
-                if (this == null) return false
-                return Diets.entries.any { it.displayName.lowercase() == this.lowercase() }
-            }
-
-            val diets = call.parameters["diet"]?.lowercase()
-
-            if (diets == null || !diets.isValidDietDisplayName()) {
-                call.respond(HttpStatusCode.BadRequest, "Invalid diet choice '$diets")
-                return@get
-            }
-
-            val dietsChoice = FakeRecipeRepository.findByDiets(diets)
-
-            if (dietsChoice.isEmpty()) {
-                call.respond(HttpStatusCode.BadRequest, "Invalid diet choice '$diets'")
-            } else {
-                call.respond(dietsChoice)
-            }
-        }
+//        get("/diets/{diet}") {
+//            fun String?.isValidDietDisplayName(): Boolean {
+//                if (this == null) return false
+//                return Diet.entries.any { it.displayName.lowercase() == this.lowercase() }
+//            }
+//
+//            val diets = call.parameters["diet"]?.lowercase()
+//
+//            if (diets == null || !diets.isValidDietDisplayName()) {
+//                call.respond(HttpStatusCode.BadRequest, "Invalid diet choice '$diets")
+//                return@get
+//            }
+//
+//            val dietsChoice = recipeRepo.findByDiets(diets)
+//
+//            if (dietsChoice.isEmpty()) {
+//                call.respond(HttpStatusCode.BadRequest, "Invalid diet choice '$diets'")
+//            } else {
+//                call.respond(dietsChoice)
+//            }
+//        }
 
 //        Get by kitchen style
-        get("/kitchen/{style}") {
-            val style = call.parameters["style"]?.lowercase()
-
-            if (style == null) {
-                call.respond(HttpStatusCode.BadRequest, "Missing kitchen style.")
-                return@get
-            }
-
-            val recipes = FakeRecipeRepository.findByKitchenStyle(style)
-
-            if (recipes.isEmpty()) {
-                call.respond(HttpStatusCode.NotFound, "No recipes found for kitchen style '$style'.")
-            } else {
-                call.respond(recipes)
-            }
-
-
-        }
+//        get("/kitchen/{style}") {
+//            val style = call.parameters["style"]?.lowercase()
+//
+//            if (style == null) {
+//                call.respond(HttpStatusCode.BadRequest, "Missing kitchen style.")
+//                return@get
+//            }
+//
+//            val recipes = recipeRepo.findByKitchenStyle(style)
+//
+//            if (recipes.isEmpty()) {
+//                call.respond(HttpStatusCode.NotFound, "No recipes found for kitchen style '$style'.")
+//            } else {
+//                call.respond(recipes)
+//            }
+//
+//
+//        }
 
         get("/{id}") {
             // controleert of de parameter {id} in de url naar een Long type geconvert kan worden.
-            val id: Long = call.parameters["id"]?.toLongOrNull()
+            val id: Int = call.parameters["id"]?.toIntOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest)
 
             // controleert of de user met 'id' bestaat
 //                val recipe = FakeRecipeRepository.recipeService.findById(id)
-            val recipe = FakeRecipeRepository.findById(id)
+            val recipe = recipeRepo.findById(id)
                 ?: return@get call.respond(HttpStatusCode.NotFound)
 
             call.respond(HttpStatusCode.OK, recipe)
         }
+
         authenticate {
             delete("/{id}") {
                 if(call.requireAdmin()){
                     // controleert of de parameter {id} in de url naar een Long type geconvert kan worden.
-                    val id: Long = call.parameters["id"]?.toLongOrNull()
+                    val id: Int = call.parameters["id"]?.toIntOrNull()
                         ?: return@delete call.respond(HttpStatusCode.BadRequest)
 
-                    val succes = FakeRecipeRepository.delete(id)
+                    val succes = recipeRepo.delete(id)
                     if (succes) {
                         call.respond(HttpStatusCode.OK, "Recipe with id: $id succesfully deleted.")
                     } else {
@@ -154,8 +154,6 @@ fun Route.recipesRoutes() {
                 } else {
                     call.respond(HttpStatusCode.Unauthorized)
                 }
-
-
             }
 
 //            put("/{id}") {
@@ -190,17 +188,9 @@ fun Route.recipesRoutes() {
 
         }
         post("/ingredient"){
-            val ingredient = call.receive<Ingredients>()
-
-            val foundRecipes = mutableListOf<Recipes>()
-
-            for (recipe in FakeRecipeRepository.recipes) {
-                for(ingredientUnit in recipe.ingredients) {
-                    if(ingredientUnit.ingredient.name == ingredient.name){
-                        foundRecipes.add(recipe)
-                    }
-                }
-            }
+            val ingredient = call.receive<Ingredient>()
+            val ingredientRepo = IngredientUnitRepositoryImpl()
+            val foundRecipes = ingredientRepo.findRecipesByIngredient(ingredient.name)
 
             if(foundRecipes.isNotEmpty()) {
                 call.respond(HttpStatusCode.OK, foundRecipes)

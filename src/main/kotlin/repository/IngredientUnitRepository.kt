@@ -2,6 +2,7 @@ package api.repository
 
 
 import api.models.Difficulty
+import api.models.Ingredient
 import api.models.IngredientUnit
 import api.models.IngredientUnits
 import api.models.Ingredients
@@ -10,10 +11,13 @@ import api.models.MealType
 import api.models.Recipe
 import api.models.Recipes
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
+import responses.RecipeSearchResult
 import kotlin.math.E
 
 interface IngredientUnitRepository {
-
+ suspend fun findRecipesByIngredient(ingredientName : String): List<RecipeSearchResult>
 }
 
 class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
@@ -33,7 +37,31 @@ class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
         stmt[IngredientUnits.amount] = ingredientUnit.amount
         stmt[IngredientUnits.unitType] = ingredientUnit.unitType
     }
-) {}
+) {
+    override suspend fun findRecipesByIngredient(ingredientName: String): List<RecipeSearchResult> {
+        val recipeIds = transaction {
+            IngredientUnits.selectAll()
+                .where { IngredientUnits.ingredientName like ingredientName }
+                .map { row -> row[IngredientUnits.recipeId] }
+        }
+        val foundRecipes = mutableListOf<RecipeSearchResult>()
+        for (recipe in recipeIds) {
+            val search = transaction {
+                Recipes.selectAll()
+                    .where { Recipes.id eq recipe }
+                    .map { row ->
+                        RecipeSearchResult(
+                            row[Recipes.id],
+                            row[Recipes.title],
+                            row[Recipes.image]
+                        )
+                    }
+            }
+            foundRecipes.addAll(search)
+        }
+        return foundRecipes
+    }
+}
 
 
 //object FakeIngredientUnitRepository : IngredientUnitRepository {

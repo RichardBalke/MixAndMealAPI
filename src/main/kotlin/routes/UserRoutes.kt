@@ -39,7 +39,7 @@ fun Route.userRoutes() {
 
             get("/{id}") {
                 // controleert of de parameter {id} in de url naar een Long type geconvert kan worden.
-                val id: Int = call.parameters["id"]?.toIntOrNull()
+                val id: String = call.parameters["id"]
                     ?: return@get call.respond(HttpStatusCode.BadRequest)
 
                 if (id == call.authenticatedUserId()) {
@@ -57,13 +57,7 @@ fun Route.userRoutes() {
                 }
             }
 
-            get("/user/favorites/{userId}")
-            {
-                // userid -> user
-                // favorites for user
 
-
-            }
 
 //            post("/favourites"){
 //                val principal = call.principal<JWTPrincipal>()

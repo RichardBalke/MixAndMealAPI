@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-
+    initDatabase()
     val tokenService = JwtService()
     val tokenConfig = TokenConfig(
         issuer = environment.config.property("jwt.issuer").getString(),
@@ -22,11 +22,10 @@ fun Application.module() {
 
     configureSerialization()
     configureSecurity(tokenConfig)
-    initDatabase()
     configureRouting(tokenService, tokenConfig)
 }
 
-fun initDatabase() {
+fun Application.initDatabase() {
     Database.connect(
         url = "jdbc:postgresql://localhost:5432/postgres",
         driver = "org.postgresql.Driver",

@@ -7,19 +7,19 @@ import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
 
 
-suspend fun ApplicationCall.authenticatedUserId(): Int {
+suspend fun ApplicationCall.authenticatedUserId(): String {
     val principal = authentication.principal<JWTPrincipal>()
-    val id = principal?.getClaim("userId", String::class)?.toInt()
+    val id = principal?.getClaim("userId", String::class)
     if (id != null) {
         return id
     } else {
-        return -1
+        return ""
     }
 }
 
 suspend fun ApplicationCall.requireAdmin(): Boolean {
     val principal = authentication.principal<JWTPrincipal>()
-    val id = principal?.getClaim("userId", String::class)?.toInt()
+    val id = principal?.getClaim("userId", String::class)
     if (id != null) {
         val role = UserRepositoryImpl().getRoleById(id)
         return (role == Role.ADMIN)
