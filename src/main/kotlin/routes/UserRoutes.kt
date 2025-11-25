@@ -57,6 +57,14 @@ fun Route.userRoutes() {
                 }
             }
 
+            get("/user/favorites/{userId}")
+            {
+                // userid -> user
+                // favorites for user
+
+
+            }
+
 //            post("/favourites"){
 //                val principal = call.principal<JWTPrincipal>()
 //                val userId = principal?.getClaim("userId", String::class)?.toIntOrNull()
