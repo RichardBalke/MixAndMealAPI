@@ -16,7 +16,7 @@ class AllergensRepositoryImpl() : AllergensRepository, CrudImplementation<Allerg
         row[Allergens.description],
         row[Allergens.description]) },
     idColumns = listOf(Allergens.id),
-    idExtractor = {listOf(Allergens.id)},
+    idExtractor = {entry -> listOf(entry)},
     entityMapper = { stmt, allergen ->
         stmt[Allergens.id] = allergen.id
         stmt[Allergens.name] = allergen.name

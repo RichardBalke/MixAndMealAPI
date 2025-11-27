@@ -4,6 +4,7 @@ package api.repository
 import api.models.Difficulty
 import api.models.Ingredient
 import api.models.IngredientUnit
+import api.models.IngredientUnitId
 import api.models.IngredientUnits
 import api.models.Ingredients
 import api.models.KitchenStyle
@@ -21,7 +22,7 @@ interface IngredientUnitRepository {
 }
 
 class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
-    CrudImplementation<IngredientUnit, Pair<Int, String>>(
+    CrudImplementation<IngredientUnit, IngredientUnitId>(
     table = IngredientUnits,
     toEntity = { row ->
         IngredientUnit(row[IngredientUnits.recipeId],
@@ -30,7 +31,7 @@ class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
             row[IngredientUnits.unitType]
         )},
     idColumns = listOf(IngredientUnits.recipeId, IngredientUnits.ingredientName),
-    idExtractor = {listOf(IngredientUnits.recipeId, IngredientUnits.ingredientName)},
+    idExtractor = {entry -> listOf(entry.recipeId, entry.ingredientName)},
     entityMapper = { stmt, ingredientUnit ->
         stmt[IngredientUnits.recipeId] = ingredientUnit.recipeId
         stmt[IngredientUnits.ingredientName] = ingredientUnit.ingredientName

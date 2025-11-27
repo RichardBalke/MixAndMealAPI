@@ -13,7 +13,7 @@ class IngredientsRepositoryImpl : IngredientsRepository, CrudImplementation<Ingr
     toEntity = { row ->
         Ingredient(row[Ingredients.name], row[Ingredients.description]) },
     idColumns = listOf(Ingredients.name),
-    idExtractor = {listOf(Ingredients.name)},
+    idExtractor = {entry -> listOf(entry)},
     entityMapper = { stmt, ingredient ->
         stmt[Ingredients.name] = ingredient.name
         stmt[Ingredients.description] = ingredient.description

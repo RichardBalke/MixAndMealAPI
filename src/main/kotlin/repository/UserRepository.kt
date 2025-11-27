@@ -20,7 +20,7 @@ class UserRepositoryImpl : UserRepository, CrudImplementation<User, String>(
         val roleEnum = Role.valueOf(roleString)
         User(row[Users.name], row[Users.email], row[Users.password], roleEnum) },
     idColumns = listOf(Users.email),
-    idExtractor = {listOf(Users.email)},
+    idExtractor = {entry -> listOf(entry)},
     entityMapper = { stmt, user ->
         stmt[Users.name] = user.name
         stmt[Users.email] = user.email
