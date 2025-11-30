@@ -1,4 +1,9 @@
 package models.tables
 
-class Diet {
+import org.jetbrains.exposed.sql.Table
+
+object Diet : Table() {
+    val id = integer(name = "id").uniqueIndex().autoIncrement()
+    val displayName = varchar("displayname", 255)
+    val description = varchar("description", 255)
 }
