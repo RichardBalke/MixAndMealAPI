@@ -5,7 +5,7 @@ import io.ktor.server.response.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import service.UserDietsService
-import api.models.UserDietEntry
+import models.dto.UserDietEntry
 import io.ktor.server.routing.Route
 import io.ktor.http.*
 

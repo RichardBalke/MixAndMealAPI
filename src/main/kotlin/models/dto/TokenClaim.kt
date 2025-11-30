@@ -1,4 +1,4 @@
-package models
+package models.dto
 
 data class TokenClaim(
     val name: String,

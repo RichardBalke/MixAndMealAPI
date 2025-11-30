@@ -5,7 +5,7 @@ import io.ktor.server.response.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import service.UserFavouritesService
-import api.models.UserFavouritesEntry
+import models.dto.UserFavouritesEntry
 import io.ktor.server.routing.Route
 import io.ktor.http.*
 

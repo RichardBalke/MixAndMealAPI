@@ -1,6 +1,6 @@
 package repository
 
-import api.models.UserDietEntry
+import models.dto.UserDietEntry
 import api.models.UserDiets
 import api.repository.CrudImplementation
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq

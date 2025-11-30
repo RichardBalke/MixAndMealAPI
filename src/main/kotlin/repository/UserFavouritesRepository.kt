@@ -1,6 +1,6 @@
 package repository
 
-import api.models.UserFavouritesEntry
+import models.dto.UserFavouritesEntry
 import api.models.UserFavourites
 import api.repository.CrudImplementation
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq

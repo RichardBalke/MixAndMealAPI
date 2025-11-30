@@ -1,7 +1,7 @@
 package service
 
 import repository.UserAllergensRepository
-import api.models.UserAllergenEntry
+import models.dto.UserAllergenEntry
 
 class UserAllergensService(private val userAllergensRepository: UserAllergensRepository) {
 

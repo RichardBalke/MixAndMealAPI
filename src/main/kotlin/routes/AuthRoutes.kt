@@ -11,8 +11,8 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import models.TokenClaim
-import models.TokenConfig
+import models.dto.TokenClaim
+import models.dto.TokenConfig
 import requests.AuthRequest
 import responses.AuthResponse
 import service.JwtService

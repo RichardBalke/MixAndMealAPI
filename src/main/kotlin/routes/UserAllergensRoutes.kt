@@ -5,7 +5,7 @@ import io.ktor.server.response.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import service.UserAllergensService
-import api.models.UserAllergenEntry
+import models.dto.UserAllergenEntry
 import io.ktor.http.*
 
 fun Route.userAllergensRoutes(userAllergensService: UserAllergensService) {

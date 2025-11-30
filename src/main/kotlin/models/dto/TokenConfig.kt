@@ -1,4 +1,4 @@
-package models
+package models.dto
 
 data class TokenConfig(
     val issuer: String,

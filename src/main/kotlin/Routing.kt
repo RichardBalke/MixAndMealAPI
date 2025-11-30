@@ -6,7 +6,7 @@ import api.routes.recipesRoutes
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import models.TokenConfig
+import models.dto.TokenConfig
 import routes.authenticated
 import routes.getSecretInfo
 import routes.signIn

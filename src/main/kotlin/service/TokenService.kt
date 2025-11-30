@@ -1,7 +1,7 @@
 package service
 
-import models.TokenClaim
-import models.TokenConfig
+import models.dto.TokenClaim
+import models.dto.TokenConfig
 
 interface TokenService {
     fun generate(

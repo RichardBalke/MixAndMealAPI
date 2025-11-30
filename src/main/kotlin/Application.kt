@@ -2,7 +2,7 @@ package api
 
 import api.repository.UserRepositoryImpl
 import io.ktor.server.application.*
-import models.TokenConfig
+import models.dto.TokenConfig
 import org.jetbrains.exposed.sql.Database
 import service.JwtService
 

@@ -1,6 +1,6 @@
 package service
 
-import api.models.UserDietEntry
+import models.dto.UserDietEntry
 import repository.UserDietsRepository
 
 class UserDietsService(private val userDietsRepository: UserDietsRepository) {

@@ -1,6 +1,6 @@
 package service
 
-import api.models.UserFavouritesEntry
+import models.dto.UserFavouritesEntry
 import repository.UserFavouritesRepository
 
 class UserFavouritesService(private val userFavouritesRepository: UserFavouritesRepository) {

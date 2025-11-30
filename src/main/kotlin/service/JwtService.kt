@@ -2,8 +2,8 @@ package service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import models.TokenClaim
-import models.TokenConfig
+import models.dto.TokenClaim
+import models.dto.TokenConfig
 import java.util.Date
 
 // stateless class that only provides functionality

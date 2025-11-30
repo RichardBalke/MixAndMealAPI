@@ -5,7 +5,7 @@ import io.ktor.server.response.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import service.UserFridgeService
-import api.models.UserFridgeEntry
+import models.dto.UserFridgeEntry
 import io.ktor.server.routing.Route
 import io.ktor.http.*
 

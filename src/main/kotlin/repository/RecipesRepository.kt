@@ -1,8 +1,8 @@
 package api.repository
 
-import api.models.Difficulty
-import api.models.KitchenStyle
-import api.models.MealType
+import models.enums.Difficulty
+import models.enums.KitchenStyle
+import models.enums.MealType
 import api.models.Recipe
 import api.models.Recipes
 

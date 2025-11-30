@@ -1,6 +1,6 @@
-package models;
+package requests
 
-import kotlinx.serialization.Serializable;
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class Login(val email: String, val password: String)

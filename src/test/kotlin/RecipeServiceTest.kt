@@ -1,10 +1,10 @@
 package service
 
 import api.models.Diets
-import api.models.Difficulty
+import models.enums.Difficulty
 import api.models.IngredientUnits
-import api.models.KitchenStyle
-import api.models.MealType
+import models.enums.KitchenStyle
+import models.enums.MealType
 import api.models.Recipes
 import api.repository.FakeIngredientUnitRepository
 import api.repository.FakeRecipeRepository

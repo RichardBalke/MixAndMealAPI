@@ -1,6 +1,6 @@
 package repository
 
-import api.models.UserAllergenEntry
+import models.dto.UserAllergenEntry
 import api.models.UserAllergens
 import api.repository.CrudImplementation
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
