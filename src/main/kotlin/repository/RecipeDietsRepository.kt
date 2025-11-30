@@ -1,7 +1,6 @@
 package repository
 
 import api.repository.CrudImplementation
-import models.IngredientAllergens
 import models.RecipeDiet
 import models.RecipeDiets
 

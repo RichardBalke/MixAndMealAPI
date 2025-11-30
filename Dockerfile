@@ -1,14 +1,24 @@
-# Stage 1: Build the application
-FROM gradle:jdk24-alpine AS build
-WORKDIR /app
-COPY build.gradle.kts settings.gradle.kts ./
-COPY gradle ./gradle
-COPY src ./src
+# Stage 1: Cache Gradle dependencies
+FROM gradle:8 AS cache
+RUN mkdir -p /home/gradle/cache_home
+ENV GRADLE_USER_HOME=/home/gradle/cache_home
+COPY build.gradle.* gradle.properties /home/gradle/app/
+COPY gradle /home/gradle/app/gradle
+WORKDIR /home/gradle/app
+RUN gradle dependencies --no-daemon
+
+# Stage 2: Build Application
+FROM gradle:8 AS build
+COPY --from=cache /home/gradle/cache_home /home/gradle/.gradle
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+# Build the fat JAR, Gradle also supports shadow
+# and boot JAR by default.
 RUN gradle buildFatJar --no-daemon
 
-# Stage 2: Create the runtime image
-FROM eclipse-temurin:24-jre-alpine
-WORKDIR /app
-COPY --from=build /app/build/libs/*.jar ./ktor-app.jar
+# Stage 3: Create the Runtime Image
+FROM amazoncorretto:24 AS runtime
 EXPOSE 8080
-CMD ["java", "-jar", "ktor-app.jar"]
+RUN mkdir /app
+COPY --from=build /home/gradle/src/build/libs/*.jar /app/ktor-docker-sample.jar
+ENTRYPOINT ["java","-jar","/app/ktor-docker-sample.jar"]

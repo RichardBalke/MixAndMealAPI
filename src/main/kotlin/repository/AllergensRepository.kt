@@ -2,7 +2,6 @@ package repository
 
 import api.models.Allergen
 import api.models.Allergens
-import api.models.Recipes
 import api.repository.CrudImplementation
 
 interface AllergensRepository {

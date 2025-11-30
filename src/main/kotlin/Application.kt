@@ -10,6 +10,8 @@ fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
 }
 
+
+
 fun Application.module() {
     initDatabase()
     val tokenService = JwtService()
@@ -27,7 +29,7 @@ fun Application.module() {
 
 fun Application.initDatabase() {
     Database.connect(
-        url = "jdbc:postgresql://localhost:5432/postgres",
+        url = "jdbc:postgresql://docker-db-1",
         driver = "org.postgresql.Driver",
         user = "postgres",
         password = "admin"

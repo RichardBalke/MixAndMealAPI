@@ -47,4 +47,23 @@ tasks.test {
     useJUnitPlatform()
 }
 
-
+ktor {
+    fatJar {
+        archiveFileName.set("fat.jar")
+    }
+    docker {
+        portMappings.set(listOf(
+            io.ktor.plugin.features.DockerPortMapping(
+                80,
+                8080,
+                io.ktor.plugin.features.DockerPortMappingProtocol.TCP
+            )
+        ))
+        environmentVariables.set(
+            listOf(
+                io.ktor.plugin.features.DockerEnvironmentVariable(
+                    "JWT_SECRET",
+                    "secret")
+            ))
+    }
+}
