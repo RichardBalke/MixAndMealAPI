@@ -5,11 +5,16 @@ import models.enums.KitchenStyle
 import models.enums.MealType
 import models.dto.RecipeEntry
 import models.tables.Recipe
+import models.tables.RecipeDiet
+import models.tables.Diet
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 
 interface RecipesRepository : CrudRepository<RecipeEntry, Int> {
     suspend fun findByTitle(title: String): List<RecipeEntry>
-    suspend fun findByDifficulty(difficulty: String?): List<RecipeEntry>
-    suspend fun findByMealType(mealType: String?): List<RecipeEntry>
+    suspend fun findByDifficulty(difficulty: String): List<RecipeEntry>
+    suspend fun findByMealType(mealType: String): List<RecipeEntry>
     suspend fun findByDiets(diets: String): List<RecipeEntry>
     suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry>
 
@@ -50,24 +55,39 @@ class RecipesRepositoryImpl : CrudImplementation<RecipeEntry, Int>(
         stmt[Recipe.kitchenStyle] = recipe.kitchenStyle.name
     }), RecipesRepository {
 
-    override suspend fun findByTitle(title: String): List<RecipeEntry> {
-        TODO("Not yet implemented")
+    override suspend fun findByTitle(title: String): List<RecipeEntry>  = transaction {
+        Recipe.selectAll()
+            .where { Recipe.title like title }
+            .mapNotNull(toEntity)
     }
 
-    override suspend fun findByDifficulty(difficulty: String?): List<RecipeEntry> {
-        TODO("Not yet implemented")
+    override suspend fun findByDifficulty(difficulty: String): List<RecipeEntry> = transaction{
+        Recipe.selectAll()
+            .where(Recipe.difficulty eq difficulty)
+            .mapNotNull(toEntity)
     }
 
-    override suspend fun findByMealType(mealType: String?): List<RecipeEntry> {
-        TODO("Not yet implemented")
+    override suspend fun findByMealType(mealType: String): List<RecipeEntry> = transaction {
+        Recipe.selectAll()
+            .where(Recipe.mealType eq mealType)
+            .mapNotNull(toEntity)
     }
 
-    override suspend fun findByDiets(diets: String): List<RecipeEntry> {
-        TODO("Not yet implemented")
+
+    // Deze functie moet goed getest worden. Als dit werkt kunnen we op deze manier ook andere queries doen!!!
+    // !!!
+    override suspend fun findByDiets(diets: String): List<RecipeEntry> = transaction {
+        (Recipe innerJoin RecipeDiet innerJoin Diet)
+            .selectAll()
+            .where(Diet.displayName eq diets)
+            .map(toEntity)
+
     }
 
-    override suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry> {
-        TODO("Not yet implemented")
+    override suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry> = transaction {
+        Recipe.selectAll()
+            .where(Recipe.kitchenStyle eq kitchenStyle)
+            .mapNotNull(toEntity)
     }
 
 }
