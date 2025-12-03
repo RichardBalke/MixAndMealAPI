@@ -1,8 +1,5 @@
 package api.routes
 
-import api.models.Diet
-import api.models.Ingredient
-import api.models.Recipe
 import api.repository.IngredientUnitRepositoryImpl
 import api.repository.RecipesRepositoryImpl
 import io.ktor.http.HttpStatusCode
@@ -14,6 +11,8 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import models.dto.IngredientEntry
+import models.dto.RecipeEntry
 import service.requireAdmin
 
 fun Route.recipesRoutes() {
@@ -27,7 +26,7 @@ fun Route.recipesRoutes() {
         authenticate {
             post {
                 if(call.requireAdmin()){
-                    val request = call.receive<Recipe>()
+                    val request = call.receive<RecipeEntry>()
                     val created = recipeRepo.create(request)
                     call.respond(HttpStatusCode.Created, created)
                 } else {
@@ -188,7 +187,7 @@ fun Route.recipesRoutes() {
 
         }
         post("/ingredient"){
-            val ingredient = call.receive<Ingredient>()
+            val ingredient = call.receive<IngredientEntry>()
             val ingredientRepo = IngredientUnitRepositoryImpl()
             val foundRecipes = ingredientRepo.findRecipesByIngredient(ingredient.name)
 

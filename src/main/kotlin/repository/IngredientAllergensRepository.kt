@@ -1,21 +1,21 @@
 package repository
 
 import api.repository.CrudImplementation
-import models.IngredientAllergen
-import models.IngredientAllergens
+import models.dto.IngredientAllergenEntry
+import models.tables.IngredientAllergen
 
 interface IngredientAllergensRepository {
 }
 
-class IngredientAllergensRepositoryImpl() : CrudImplementation<IngredientAllergen, IngredientAllergen>
+class IngredientAllergensRepositoryImpl() : CrudImplementation<IngredientAllergenEntry, IngredientAllergenEntry>
     (
-        table = IngredientAllergens,
+        table = IngredientAllergen,
         toEntity = { row ->
-            IngredientAllergen(row[IngredientAllergens.ingredientName],
-                row[IngredientAllergens.allergenId]) },
-        idColumns = listOf(IngredientAllergens.ingredientName, IngredientAllergens.allergenId),
+            IngredientAllergenEntry(row[IngredientAllergen.ingredientName],
+                row[IngredientAllergen.allergenId]) },
+        idColumns = listOf(IngredientAllergen.ingredientName, IngredientAllergen.allergenId),
         idExtractor = { entry -> listOf(entry.ingredientName, entry.allergenId)},
         entityMapper = {stmt, ingredientAllergen ->
-            stmt[IngredientAllergens.ingredientName] = ingredientAllergen.ingredientName
-            stmt[IngredientAllergens.allergenId] = ingredientAllergen.allergenId
+            stmt[IngredientAllergen.ingredientName] = ingredientAllergen.ingredientName
+            stmt[IngredientAllergen.allergenId] = ingredientAllergen.allergenId
         }), IngredientAllergensRepository { }

@@ -1,6 +1,5 @@
 package routes
 
-import api.models.User
 import api.repository.UserRepositoryImpl
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -13,6 +12,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import models.dto.TokenClaim
 import models.dto.TokenConfig
+import models.dto.UserEntry
 import requests.AuthRequest
 import responses.AuthResponse
 import service.JwtService
@@ -41,7 +41,7 @@ fun Route.signUp(){
 
         val userCount = userRepo.findAll().count()
 
-        val user = User(
+        val user = UserEntry(
             name = request.username,
             password = request.password,
             email = request.email,

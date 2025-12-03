@@ -1,30 +1,29 @@
 package api.repository
 
-import api.models.Ingredient
-import api.models.Ingredients
-import api.models.Users
+import models.dto.IngredientEntry
+import models.tables.Ingredient
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface IngredientsRepository {
-    suspend fun findByName(name: String): Ingredient?
-    suspend fun updateAllergens(ingredientName : String, newAllergens : List<Int>) : Ingredient
+    suspend fun findByName(name: String): IngredientEntry?
+    suspend fun updateAllergens(ingredientName : String, newAllergens : List<Int>) : IngredientEntry
 }
 
-class IngredientsRepositoryImpl : IngredientsRepository, CrudImplementation<Ingredient, String>(
-    table = Ingredients,
+class IngredientsRepositoryImpl : IngredientsRepository, CrudImplementation<IngredientEntry, String>(
+    table = Ingredient,
     toEntity = { row ->
-        Ingredient(row[Ingredients.name], row[Ingredients.description]) },
-    idColumns = listOf(Ingredients.name),
+        IngredientEntry(row[Ingredient.name], row[Ingredient.description]) },
+    idColumns = listOf(Ingredient.name),
     idExtractor = {entry -> listOf(entry)},
     entityMapper = { stmt, ingredient ->
-        stmt[Ingredients.name] = ingredient.name
-        stmt[Ingredients.description] = ingredient.description
+        stmt[Ingredient.name] = ingredient.name
+        stmt[Ingredient.description] = ingredient.description
     }
 ) {
-    override suspend fun findByName(name: String): Ingredient? = transaction {
-        Ingredients.selectAll()
-            .where { Ingredients.name like name }
+    override suspend fun findByName(name: String): IngredientEntry? = transaction {
+        Ingredient.selectAll()
+            .where { Ingredient.name like name }
             .mapNotNull(toEntity)
             .singleOrNull()
     }
@@ -32,7 +31,7 @@ class IngredientsRepositoryImpl : IngredientsRepository, CrudImplementation<Ingr
     override suspend fun updateAllergens(
         ingredientName: String,
         newAllergens: List<Int>
-    ): Ingredient {
+    ): IngredientEntry {
         TODO("Not yet implemented")
     }
 

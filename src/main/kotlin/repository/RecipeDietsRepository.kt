@@ -1,20 +1,20 @@
 package repository
 
 import api.repository.CrudImplementation
-import models.RecipeDiet
-import models.RecipeDiets
+import models.dto.RecipeDietEntry
+import models.tables.RecipeDiet
 
 interface RecipeDietsRepository {
 }
 
-class RecipeDietsRepositoryImpl() : CrudImplementation<RecipeDiet, RecipeDiet>(
-    table = RecipeDiets,
+class RecipeDietsRepositoryImpl() : CrudImplementation<RecipeDietEntry, RecipeDietEntry>(
+    table = RecipeDiet,
     toEntity = {row ->
-        RecipeDiet(row[RecipeDiets.recipeId], row[RecipeDiets.dietId])},
-    idColumns = listOf(RecipeDiets.recipeId, RecipeDiets.dietId),
+        RecipeDietEntry(row[RecipeDiet.recipeId], row[RecipeDiet.dietId])},
+    idColumns = listOf(RecipeDiet.recipeId, RecipeDiet.dietId),
     idExtractor = { entry -> listOf(entry.recipeId, entry.dietId) },
     entityMapper = { stmt, recipeDiet ->
-        stmt[RecipeDiets.recipeId] = recipeDiet.recipeId
-        stmt[RecipeDiets.dietId] = recipeDiet.dietId
+        stmt[RecipeDiet.recipeId] = recipeDiet.recipeId
+        stmt[RecipeDiet.dietId] = recipeDiet.dietId
     }
 ), RecipeDietsRepository {}
