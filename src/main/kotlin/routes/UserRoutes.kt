@@ -1,9 +1,5 @@
 package api.routes
 
-import api.models.Allergens
-import api.models.Ingredients
-import api.models.Recipes
-import api.models.User
 import api.repository.UserRepositoryImpl
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
