@@ -2,7 +2,7 @@ package models.tables
 
 import org.jetbrains.exposed.sql.Table
 
-object Recipe : Table() {
+object Recipes : Table() {
     val id = integer("recipe_id").autoIncrement().uniqueIndex()
     val title = varchar("title", 255)
     val description = varchar("description", 255)

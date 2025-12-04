@@ -1,7 +1,7 @@
 package api.repository
 
 import models.dto.IngredientEntry
-import models.tables.Ingredient
+import models.tables.Ingredients
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -11,19 +11,19 @@ interface IngredientsRepository {
 }
 
 class IngredientsRepositoryImpl : IngredientsRepository, CrudImplementation<IngredientEntry, String>(
-    table = Ingredient,
+    table = Ingredients,
     toEntity = { row ->
-        IngredientEntry(row[Ingredient.name], row[Ingredient.description]) },
-    idColumns = listOf(Ingredient.name),
+        IngredientEntry(row[Ingredients.name], row[Ingredients.description]) },
+    idColumns = listOf(Ingredients.name),
     idExtractor = {entry -> listOf(entry)},
     entityMapper = { stmt, ingredient ->
-        stmt[Ingredient.name] = ingredient.name
-        stmt[Ingredient.description] = ingredient.description
+        stmt[Ingredients.name] = ingredient.name
+        stmt[Ingredients.description] = ingredient.description
     }
 ) {
     override suspend fun findByName(name: String): IngredientEntry? = transaction {
-        Ingredient.selectAll()
-            .where { Ingredient.name like name }
+        Ingredients.selectAll()
+            .where { Ingredients.name like name }
             .mapNotNull(toEntity)
             .singleOrNull()
     }

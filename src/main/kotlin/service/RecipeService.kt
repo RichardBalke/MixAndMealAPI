@@ -11,6 +11,22 @@ class RecipeService(private val recipeRepository: RecipesRepository) {
         return "${hours}h ${minutes}m"
     }
 
+    suspend fun getAllRecipes(): List<RecipeEntry> {
+        return recipeRepository.findAll()
+    }
+
+    suspend fun addRecipes(recipe: RecipeEntry) {
+        recipeRepository.create(recipe)
+    }
+
+    suspend fun getRecipe(id: Int): RecipeEntry? {
+        return recipeRepository.findById(id)
+    }
+
+    suspend fun deleteRecipe(id: Int) : Boolean {
+        return recipeRepository.delete(id)
+    }
+
     suspend fun findByTitle(title: String): List<RecipeEntry>{
         return recipeRepository.findByTitle(title)
     }

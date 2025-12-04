@@ -13,21 +13,22 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import models.dto.IngredientEntry
 import models.dto.RecipeEntry
+import service.RecipeService
 import service.requireAdmin
 
-fun Route.recipesRoutes() {
-    val recipeRepo = RecipesRepositoryImpl()
+fun Route.recipesRoutes(recipeRepo : RecipeService) {
+
     route("/recipes") {
 
         // Get all recipes
         get {
-            call.respond(recipeRepo.findAll())
+            call.respond(recipeRepo.getAllRecipes())
         }
-        authenticate {
+//        authenticate {
             post {
                 if(call.requireAdmin()){
                     val request = call.receive<RecipeEntry>()
-                    val created = recipeRepo.create(request)
+                    val created = recipeRepo.addRecipes(request)
                     call.respond(HttpStatusCode.Created, created)
                 } else {
                     call.respond(HttpStatusCode.Unauthorized)
@@ -131,7 +132,7 @@ fun Route.recipesRoutes() {
 
             // controleert of de user met 'id' bestaat
 //                val recipe = FakeRecipeRepository.recipeService.findById(id)
-            val recipe = recipeRepo.findById(id)
+            val recipe = recipeRepo.getRecipe(id)
                 ?: return@get call.respond(HttpStatusCode.NotFound)
 
             call.respond(HttpStatusCode.OK, recipe)
@@ -144,7 +145,7 @@ fun Route.recipesRoutes() {
                     val id: Int = call.parameters["id"]?.toIntOrNull()
                         ?: return@delete call.respond(HttpStatusCode.BadRequest)
 
-                    val succes = recipeRepo.delete(id)
+                    val succes = recipeRepo.deleteRecipe(id)
                     if (succes) {
                         call.respond(HttpStatusCode.OK, "Recipe with id: $id succesfully deleted.")
                     } else {
@@ -198,6 +199,6 @@ fun Route.recipesRoutes() {
                 call.respond(HttpStatusCode.NotFound)
             }
 
-        }
+//        }
     }
 }

@@ -2,7 +2,7 @@ package repository
 
 import models.dto.UserDietEntry
 import api.repository.CrudImplementation
-import models.tables.UserDiet
+import models.tables.UserDiets
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -15,24 +15,24 @@ interface UserDietsRepository {
 class UserDietsRepositoryImpl :
     UserDietsRepository,
     CrudImplementation<UserDietEntry, UserDietEntry>(
-        table = UserDiet,
+        table = UserDiets,
         toEntity = { row ->
             UserDietEntry(
-                userId = row[UserDiet.userId],
-                dietId = row[UserDiet.dietId]
+                userId = row[UserDiets.userId],
+                dietId = row[UserDiets.dietId]
             )
         },
-        idColumns = listOf(UserDiet.userId, UserDiet.dietId),
+        idColumns = listOf(UserDiets.userId, UserDiets.dietId),
         idExtractor = { entry -> listOf(entry.userId, entry.dietId) },
         entityMapper = { stmt, entry ->
-            stmt[UserDiet.userId] = entry.userId
-            stmt[UserDiet.dietId] = entry.dietId
+            stmt[UserDiets.userId] = entry.userId
+            stmt[UserDiets.dietId] = entry.dietId
         }
     ) {
 
     override suspend fun getDietsForUser(userId: String): List<UserDietEntry> = transaction {
-        UserDiet
-            .select(UserDiet.userId eq userId)
+        UserDiets
+            .select(UserDiets.userId eq userId)
             .map(toEntity)
     }
 

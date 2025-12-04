@@ -1,18 +1,18 @@
 insert into users (name, email, password, role) values
-    ('Alice Johnson',   'alice@example.com',   'pass123',    'user'),
-    ('Bob Smith',       'bob@example.com',     'secret456',  'user'),
-    ('Charlie Green',   'charlie@example.com', 'charlie789', 'user'),
-    ('Diana Carter',    'diana@example.com',   'diana111',   'user'),
-    ('Ethan Brooks',    'ethan@example.com',   'ethan222',   'user'),
-    ('Fiona White',     'fiona@example.com',   'fiona333',   'user'),
-    ('George Hill',     'george@example.com',  'george444',  'user'),
-    ('Hannah Reed',     'hannah@example.com',  'hannah555',  'user'),
-    ('Ian Black',       'ian@example.com',     'ian666',     'user'),
-    ('Julia Stone',     'julia@example.com',   'julia777',   'user'),
-    ('Bart',     'bart@example.com',   'admin123',   'admin'),
-    ('Fauve',     'fauve@example.com',   'admin123',   'admin'),
-    ('Richard',     'richard@example.com',   'admin123',   'admin'),
-    ('Yoran',     'yoran@example.com',   'admin123',   'admin');
+    ('Alice Johnson',   'alice@example.com',   'pass123',    'USER'),
+    ('Bob Smith',       'bob@example.com',     'secret456',  'USER'),
+    ('Charlie Green',   'charlie@example.com', 'charlie789', 'USER'),
+    ('Diana Carter',    'diana@example.com',   'diana111',   'USER'),
+    ('Ethan Brooks',    'ethan@example.com',   'ethan222',   'USER'),
+    ('Fiona White',     'fiona@example.com',   'fiona333',   'USER'),
+    ('George Hill',     'george@example.com',  'george444',  'USER'),
+    ('Hannah Reed',     'hannah@example.com',  'hannah555',  'USER'),
+    ('Ian Black',       'ian@example.com',     'ian666',     'USER'),
+    ('Julia Stone',     'julia@example.com',   'julia777',   'USER'),
+    ('Bart',     'bart@example.com',   'admin123',   'ADMIN'),
+    ('Fauve',     'fauve@example.com',   'admin123',   'ADMIN'),
+    ('Richard',     'richard@example.com',   'admin123',   'ADMIN'),
+    ('Yoran',     'yoran@example.com',   'admin123',   'ADMIN');
 
 insert into recipes (recipe_id, title, description, preptime, cookingtime, difficulty, image, mealtype, kitchenstyle) values
     (1, 'Spaghetti Bolognese', 'Classic Italian pasta with meat sauce.', 15, 45, 'medium', NULL, 'dinner', 'Italian'),
