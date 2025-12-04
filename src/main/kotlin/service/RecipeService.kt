@@ -1,6 +1,9 @@
 package service
 
-class RecipeService {
+import api.repository.RecipesRepository
+import models.dto.RecipeEntry
+
+class RecipeService(private val recipeRepository: RecipesRepository) {
 
     fun formatCookingTime(minutes: Int): String {
         val hours = minutes / 60
@@ -8,17 +11,19 @@ class RecipeService {
         return "${hours}h ${minutes}m"
     }
 
-//    Ingredienten en recepten matching functie. Matcht op minsten 1 ingredient aanwezig. sortering op beste matches
-//
-//    suspend fun findBestMatchesByIngredients(selectedIngredients: List<String>): List<Pair<Recipe, Double>> {
-//        return recipes
-//            .map { recipe ->
-//                val totalIngredients = recipe.ingredients.size
-//                val matchedCount = recipe.ingredients.count { selectedIngredients.contains(it.ingredient.name) }
-//                val matchPercentage = if (totalIngredients > 0) matchedCount.toDouble() / totalIngredients else 0.0
-//                recipe to matchPercentage
-//            }
-//            .filter { it.second > 0 }
-//            .sortedByDescending { it.second }
-//    }
+    suspend fun findByTitle(title: String): List<RecipeEntry>{
+        return recipeRepository.findByTitle(title)
+    }
+    suspend fun findByDifficulty(difficulty: String): List<RecipeEntry>{
+        return recipeRepository.findByDifficulty(difficulty)
+    }
+    suspend fun findByMealType(mealType: String): List<RecipeEntry>{
+        return recipeRepository.findByMealType(mealType)
+    }
+    suspend fun findByDiets(diets: String): List<RecipeEntry>{
+        return recipeRepository.findByDiets(diets)
+    }
+    suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry>{
+        return recipeRepository.findByKitchenStyle(kitchenStyle)
+    }
 }

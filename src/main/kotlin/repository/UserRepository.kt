@@ -1,50 +1,50 @@
 package api.repository
 
 import api.models.Role
-import api.models.User
-import api.models.Users
+import models.dto.UserEntry
+import models.tables.User
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 
 interface UserRepository {
-    suspend fun findByUsername(username: String): User?
-    suspend fun findByEmail(email: String): User?
+    suspend fun findByUsername(username: String): UserEntry?
+    suspend fun findByEmail(email: String): UserEntry?
     suspend fun getRoleById(id: String): Role
 }
 
-class UserRepositoryImpl : UserRepository, CrudImplementation<User, String>(
-    table = Users,
+class UserRepositoryImpl : UserRepository, CrudImplementation<UserEntry, String>(
+    table = User,
     toEntity = { row ->
-        val roleString = row[Users.role]
+        val roleString = row[User.role]
         val roleEnum = Role.valueOf(roleString)
-        User(row[Users.name], row[Users.email], row[Users.password], roleEnum) },
-    idColumns = listOf(Users.email),
+        UserEntry(row[User.name], row[User.email], row[User.password], roleEnum) },
+    idColumns = listOf(User.email),
     idExtractor = {entry -> listOf(entry)},
     entityMapper = { stmt, user ->
-        stmt[Users.name] = user.name
-        stmt[Users.email] = user.email
-        stmt[Users.password] = user.password
-        stmt[Users.role] = user.role.name
+        stmt[User.name] = user.name
+        stmt[User.email] = user.email
+        stmt[User.password] = user.password
+        stmt[User.role] = user.role.name
     }
 ) {
-    override suspend fun findByUsername(username: String): User? = transaction {
-        Users.selectAll()
-            .where { Users.name eq username }
+    override suspend fun findByUsername(username: String): UserEntry? = transaction {
+        User.selectAll()
+            .where { User.name eq username }
             .mapNotNull(toEntity)
             .singleOrNull()
     }
-    override suspend fun findByEmail(email: String): User? = transaction {
-        Users.selectAll()
-            .where { Users.email eq email }
+    override suspend fun findByEmail(email: String): UserEntry? = transaction {
+        User.selectAll()
+            .where { User.email eq email }
             .mapNotNull(toEntity)
             .singleOrNull()
     }
 
     override suspend fun getRoleById(id: String): Role {
         val user = transaction {
-            Users.selectAll()
-                .where { Users.email eq id }
+            User.selectAll()
+                .where { User.email eq id }
                 .mapNotNull(toEntity)
                 .single()
         }

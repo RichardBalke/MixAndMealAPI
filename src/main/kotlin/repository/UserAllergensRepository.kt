@@ -1,8 +1,8 @@
 package repository
 
 import models.dto.UserAllergenEntry
-import api.models.UserAllergens
 import api.repository.CrudImplementation
+import models.tables.UserAllergen
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -15,24 +15,24 @@ interface UserAllergensRepository {
 class UserAllergensRepositoryImpl :
     UserAllergensRepository,
     CrudImplementation<UserAllergenEntry, UserAllergenEntry>(
-        table = UserAllergens,
+        table = UserAllergen,
         toEntity = { row ->
             UserAllergenEntry(
-                userId = row[UserAllergens.userId],
-                allergenId = row[UserAllergens.allergenId]
+                userId = row[UserAllergen.userId],
+                allergenId = row[UserAllergen.allergenId]
             )
         },
-        idColumns = listOf(UserAllergens.userId, UserAllergens.allergenId),
+        idColumns = listOf(UserAllergen.userId, UserAllergen.allergenId),
         idExtractor = { entry -> listOf(entry.userId, entry.allergenId) },
         entityMapper = { stmt, entry ->
-            stmt[UserAllergens.userId] = entry.userId
-            stmt[UserAllergens.allergenId] = entry.allergenId
+            stmt[UserAllergen.userId] = entry.userId
+            stmt[UserAllergen.allergenId] = entry.allergenId
         }
     ) {
 
     override suspend fun getAllergensForUser(userId: String): List<UserAllergenEntry> = transaction {
-        UserAllergens
-            .select(UserAllergens.userId eq userId)
+        UserAllergen
+            .select(UserAllergen.userId eq userId)
             .map(toEntity)
     }
 

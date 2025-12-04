@@ -1,8 +1,8 @@
 package repository
 
-import api.models.UserFridge
 import models.dto.UserFridgeEntry
 import api.repository.CrudImplementation
+import models.tables.UserFridge
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 

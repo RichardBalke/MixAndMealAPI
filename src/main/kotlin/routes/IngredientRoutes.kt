@@ -1,7 +1,5 @@
 package api.routes
 
-import api.models.Allergen
-import api.models.Ingredient
 import api.repository.IngredientsRepositoryImpl
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -13,6 +11,8 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import models.dto.AllergenEntry
+import models.dto.IngredientEntry
 
 fun Route.ingredientsRoutes() {
     val ingredientrepo =  IngredientsRepositoryImpl()
@@ -53,7 +53,7 @@ fun Route.ingredientsRoutes() {
         authenticate {
             // POST create
             post {
-                val request = call.receive<Ingredient>()
+                val request = call.receive<IngredientEntry>()
                 val created = ingredientrepo.create(request)
                 call.respond(HttpStatusCode.Created, created)
             }
@@ -68,7 +68,7 @@ fun Route.ingredientsRoutes() {
             // PATCH update allergens
             patch("/{id}/allergens") {
                 val id = call.parameters["id"]
-                val allergens = call.receive<List<Allergen>>()
+                val allergens = call.receive<List<AllergenEntry>>()
                 val newAllergens : List<Int> = allergens.map { it.id }
                 val ingredient = id?.let { ingredientrepo.findById(it) }
 

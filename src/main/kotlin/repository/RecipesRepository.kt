@@ -3,71 +3,91 @@ package api.repository
 import models.enums.Difficulty
 import models.enums.KitchenStyle
 import models.enums.MealType
-import api.models.Recipe
-import api.models.Recipes
+import models.dto.RecipeEntry
+import models.tables.Recipe
+import models.tables.RecipeDiet
+import models.tables.Diet
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 
-interface RecipesRepository : CrudRepository<Recipe, Int> {
-    suspend fun findByTitle(title: String): List<Recipe>
-    suspend fun findByDifficulty(difficulty: String?): List<Recipe>
-    suspend fun findByMealType(mealType: String?): List<Recipe>
-    suspend fun findByDiets(diets: String): List<Recipe>
-    suspend fun findByKitchenStyle(kitchenStyle: String): List<Recipe>
+interface RecipesRepository : CrudRepository<RecipeEntry, Int> {
+    suspend fun findByTitle(title: String): List<RecipeEntry>
+    suspend fun findByDifficulty(difficulty: String): List<RecipeEntry>
+    suspend fun findByMealType(mealType: String): List<RecipeEntry>
+    suspend fun findByDiets(diets: String): List<RecipeEntry>
+    suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry>
 
 //    suspend fun updateImage(recipeID: Long, imageUrl: String): Boolean
 //    suspend fun findByFavourites(favourites : Favourites): List<Recipes>
 }
 
 
-class RecipesRepositoryImpl : CrudImplementation<Recipe, Int>(
-    table = Recipes,
+class RecipesRepositoryImpl : CrudImplementation<RecipeEntry, Int>(
+    table = Recipe,
     toEntity = { row ->
-        val difficultyString = row[Recipes.difficulty]
+        val difficultyString = row[Recipe.difficulty]
         val difficultyEnum = Difficulty.valueOf(difficultyString)
-        val mealTypeString = row[Recipes.mealType]
+        val mealTypeString = row[Recipe.mealType]
         val mealTypeEnum = MealType.valueOf(mealTypeString)
-        val kitchenStyleString = row[Recipes.kitchenStyle]
+        val kitchenStyleString = row[Recipe.kitchenStyle]
         val kitchenStyleEnum = KitchenStyle.valueOf(kitchenStyleString)
-        Recipe(row[Recipes.id],
-            row[Recipes.title],
-            row[Recipes.description],
-            row[Recipes.prepTime],
-            row[Recipes.cookingTime],
+        RecipeEntry(row[Recipe.id],
+            row[Recipe.title],
+            row[Recipe.description],
+            row[Recipe.prepTime],
+            row[Recipe.cookingTime],
             difficultyEnum,
-            row[Recipes.image],
+            row[Recipe.image],
             mealTypeEnum,
             kitchenStyleEnum) },
-    idColumns = listOf(Recipes.id),
+    idColumns = listOf(Recipe.id),
     idExtractor =  { listOf(Int) },
     entityMapper = { stmt, recipe ->
-        stmt[Recipes.id] = recipe.id
-        stmt[Recipes.title] = recipe.title
-        stmt[Recipes.description] = recipe.description
-        stmt[Recipes.prepTime] = recipe.prepTime
-        stmt[Recipes.cookingTime] = recipe.cookingTime
-        stmt[Recipes.difficulty] = recipe.difficulty.name
-        stmt[Recipes.image] = recipe.image
-        stmt[Recipes.mealType] = recipe.mealType.name
-        stmt[Recipes.kitchenStyle] = recipe.kitchenStyle.name
+        stmt[Recipe.id] = recipe.id
+        stmt[Recipe.title] = recipe.title
+        stmt[Recipe.description] = recipe.description
+        stmt[Recipe.prepTime] = recipe.prepTime
+        stmt[Recipe.cookingTime] = recipe.cookingTime
+        stmt[Recipe.difficulty] = recipe.difficulty.name
+        stmt[Recipe.image] = recipe.image
+        stmt[Recipe.mealType] = recipe.mealType.name
+        stmt[Recipe.kitchenStyle] = recipe.kitchenStyle.name
     }), RecipesRepository {
 
-    override suspend fun findByTitle(title: String): List<Recipe> {
-        TODO("Not yet implemented")
+    override suspend fun findByTitle(title: String): List<RecipeEntry>  = transaction {
+        Recipe.selectAll()
+            .where { Recipe.title like title }
+            .mapNotNull(toEntity)
     }
 
-    override suspend fun findByDifficulty(difficulty: String?): List<Recipe> {
-        TODO("Not yet implemented")
+    override suspend fun findByDifficulty(difficulty: String): List<RecipeEntry> = transaction{
+        Recipe.selectAll()
+            .where(Recipe.difficulty eq difficulty)
+            .mapNotNull(toEntity)
     }
 
-    override suspend fun findByMealType(mealType: String?): List<Recipe> {
-        TODO("Not yet implemented")
+    override suspend fun findByMealType(mealType: String): List<RecipeEntry> = transaction {
+        Recipe.selectAll()
+            .where(Recipe.mealType eq mealType)
+            .mapNotNull(toEntity)
     }
 
-    override suspend fun findByDiets(diets: String): List<Recipe> {
-        TODO("Not yet implemented")
+
+    // Deze functie moet goed getest worden. Als dit werkt kunnen we op deze manier ook andere queries doen!!!
+    // !!!
+    override suspend fun findByDiets(diets: String): List<RecipeEntry> = transaction {
+        (Recipe innerJoin RecipeDiet innerJoin Diet)
+            .selectAll()
+            .where(Diet.displayName eq diets)
+            .map(toEntity)
+
     }
 
-    override suspend fun findByKitchenStyle(kitchenStyle: String): List<Recipe> {
-        TODO("Not yet implemented")
+    override suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry> = transaction {
+        Recipe.selectAll()
+            .where(Recipe.kitchenStyle eq kitchenStyle)
+            .mapNotNull(toEntity)
     }
 
 }

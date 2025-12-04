@@ -1,8 +1,8 @@
 package repository
 
 import models.dto.UserFavouritesEntry
-import api.models.UserFavourites
 import api.repository.CrudImplementation
+import models.tables.UserFavourite
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -15,24 +15,24 @@ interface UserFavouritesRepository {
 class UserFavouritesRepositoryImpl :
     UserFavouritesRepository,
     CrudImplementation<UserFavouritesEntry, UserFavouritesEntry>(
-        table = UserFavourites,
+        table = UserFavourite,
         toEntity = { row ->
             UserFavouritesEntry(
-                userId = row[UserFavourites.userId],
-                recipeId = row[UserFavourites.recipeId]
+                userId = row[UserFavourite.userId],
+                recipeId = row[UserFavourite.recipeId]
             )
         },
-        idColumns = listOf(UserFavourites.userId, UserFavourites.recipeId),
+        idColumns = listOf(UserFavourite.userId, UserFavourite.recipeId),
         idExtractor = { entry -> listOf(entry.userId, entry.recipeId) },
         entityMapper = { stmt, entry ->
-            stmt[UserFavourites.userId] = entry.userId
-            stmt[UserFavourites.recipeId] = entry.recipeId
+            stmt[UserFavourite.userId] = entry.userId
+            stmt[UserFavourite.recipeId] = entry.recipeId
         }
     ) {
 
     override suspend fun getFavouritesForUser(userId: String): List<UserFavouritesEntry> = transaction {
-        UserFavourites
-            .select(UserFavourites.userId eq userId)
+        UserFavourite
+            .select(UserFavourite.userId eq userId)
             .map(toEntity)
     }
 
