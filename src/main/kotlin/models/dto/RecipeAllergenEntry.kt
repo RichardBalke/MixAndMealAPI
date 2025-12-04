@@ -3,7 +3,7 @@ package models.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class IngredientAllergenEntry(
-    val ingredientName:String,
+data class RecipeAllergenEntry(
+    val recipeId:Int,
     val allergenId : Int
 )
