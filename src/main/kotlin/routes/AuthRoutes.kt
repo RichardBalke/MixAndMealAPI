@@ -17,6 +17,7 @@ import requests.AuthRequest
 import requests.Login
 import responses.AuthResponse
 import service.JwtService
+import service.UserService
 import service.requireAdmin
 
 
@@ -54,9 +55,10 @@ fun Route.signUp(){
 
 fun Route.signIn(
     tokenService: JwtService,
-    tokenConfig : TokenConfig
+    tokenConfig : TokenConfig,
+    userService : UserService
 ){
-    val userRepo = UserRepositoryImpl()
+//    val userRepo = UserRepositoryImpl()
     post("/signin"){
         val request = call.receiveNullable<Login>()
         if(request == null){
@@ -64,7 +66,7 @@ fun Route.signIn(
             return@post
         }
 
-        val user = userRepo.findByEmail(request.email)
+        val user = userService.getByEmail(request.email)
         if(user == null){
             call.respond(HttpStatusCode.Unauthorized)
             return@post

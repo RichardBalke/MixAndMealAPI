@@ -34,15 +34,16 @@ fun Route.getFullRecipe(
         get("/{recipeId}"){
             val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
 
-            val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound)
-            val diets = recipeDietService.getDietsbyRecipeId(id, dietsService)
-            val allergens = recipeAllergenService.getAllergensByRecipeId(id, allergenService)
-            val ingredients = ingredientUnitService.getIngredientsByRecipeId(id)
+            val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Recipe not found")
+            val diets = recipeDietService.getDietsbyRecipeId(id, dietsService) ?: return@get call.respond(HttpStatusCode.NotFound, "Diets not found")
+            val allergens = recipeAllergenService.getAllergensByRecipeId(id, allergenService) ?: return@get call.respond(HttpStatusCode.NotFound, "Allergens not found")
+            val ingredients = ingredientUnitService.getIngredientsByRecipeId(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Ingredients not found")
 
             val fullRecipe = FullRecipeScreenResponse(
                 recipe.id,
                 recipe.title,
                 recipe.description,
+                recipe.instructions,
                 recipe.prepTime,
                 recipe.cookingTime,
                 recipe.difficulty,
@@ -58,19 +59,20 @@ fun Route.getFullRecipe(
     }
 }
 
-fun Route.recipesRoutes(recipeRepo : RecipeService) {
+fun Route.recipesRoutes(recipeService: RecipeService) {
 
     route("/recipes") {
 
         // Get all recipes
         get {
-            call.respond(recipeRepo.getAllRecipes())
+            val recipeRepo = RecipesRepositoryImpl()
+            call.respond(recipeRepo.findAll())
         }
 //        authenticate {
             post {
                 if(call.requireAdmin()){
                     val request = call.receive<RecipeEntry>()
-                    val created = recipeRepo.addRecipes(request)
+                    val created = recipeService.addRecipes(request)
                     call.respond(HttpStatusCode.Created, created)
                 } else {
                     call.respond(HttpStatusCode.Unauthorized)
@@ -81,6 +83,7 @@ fun Route.recipesRoutes(recipeRepo : RecipeService) {
 
         //Get recipes by title
         get("/title/{title}") {
+            val recipeRepo = RecipesRepositoryImpl()
             val name = call.parameters["title"].toString()
             val title = recipeRepo.findByTitle(name)
             if (title == null) {
@@ -174,8 +177,8 @@ fun Route.recipesRoutes(recipeRepo : RecipeService) {
 
             // controleert of de user met 'id' bestaat
 //                val recipe = FakeRecipeRepository.recipeService.findById(id)
-            val recipe = recipeRepo.getRecipe(id)
-                ?: return@get call.respond(HttpStatusCode.NotFound)
+            val recipe = recipeService.getRecipe(id)
+                ?: return@get call.respond(HttpStatusCode.BadGateway, "Recipe not found")
 
             call.respond(HttpStatusCode.OK, recipe)
         }
@@ -187,7 +190,7 @@ fun Route.recipesRoutes(recipeRepo : RecipeService) {
                     val id: Int = call.parameters["id"]?.toIntOrNull()
                         ?: return@delete call.respond(HttpStatusCode.BadRequest)
 
-                    val succes = recipeRepo.deleteRecipe(id)
+                    val succes = recipeService.deleteRecipe(id)
                     if (succes) {
                         call.respond(HttpStatusCode.OK, "Recipe with id: $id succesfully deleted.")
                     } else {

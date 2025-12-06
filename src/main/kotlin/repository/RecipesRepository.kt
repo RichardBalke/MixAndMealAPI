@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-interface RecipesRepository : CrudRepository<RecipeEntry, Int> {
+interface RecipesRepository {
     suspend fun findByTitle(title: String): List<RecipeEntry>
     suspend fun findByDifficulty(difficulty: String): List<RecipeEntry>
     suspend fun findByMealType(mealType: String): List<RecipeEntry>
@@ -23,7 +23,7 @@ interface RecipesRepository : CrudRepository<RecipeEntry, Int> {
 }
 
 
-class RecipesRepositoryImpl : CrudImplementation<RecipeEntry, Int>(
+class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry, Int>(
     table = Recipes,
     toEntity = { row ->
         val difficultyString = row[Recipes.difficulty]
@@ -35,42 +35,49 @@ class RecipesRepositoryImpl : CrudImplementation<RecipeEntry, Int>(
         RecipeEntry(row[Recipes.id],
             row[Recipes.title],
             row[Recipes.description],
+            row[Recipes.instructions],
             row[Recipes.prepTime],
             row[Recipes.cookingTime],
             difficultyEnum,
-            row[Recipes.image],
+            row[Recipes.image] as? ByteArray,
             mealTypeEnum,
-            kitchenStyleEnum) },
+            kitchenStyleEnum,
+            row[Recipes.favoritesCount]) },
     idColumns = listOf(Recipes.id),
-    idExtractor =  { listOf(Int) },
+    idExtractor =  { entry -> listOf(entry) },
     entityMapper = { stmt, recipe ->
         stmt[Recipes.id] = recipe.id
         stmt[Recipes.title] = recipe.title
         stmt[Recipes.description] = recipe.description
+        stmt[Recipes.instructions] = recipe.instructions
         stmt[Recipes.prepTime] = recipe.prepTime
         stmt[Recipes.cookingTime] = recipe.cookingTime
         stmt[Recipes.difficulty] = recipe.difficulty.name
         stmt[Recipes.image] = recipe.image
         stmt[Recipes.mealType] = recipe.mealType.name
         stmt[Recipes.kitchenStyle] = recipe.kitchenStyle.name
-    }), RecipesRepository {
+        stmt[Recipes.favoritesCount] = recipe.favoritesCount
+    }){
 
     override suspend fun findByTitle(title: String): List<RecipeEntry>  = transaction {
         Recipes.selectAll()
             .where { Recipes.title like title }
             .mapNotNull(toEntity)
+            .toList()
     }
 
     override suspend fun findByDifficulty(difficulty: String): List<RecipeEntry> = transaction{
         Recipes.selectAll()
             .where(Recipes.difficulty eq difficulty)
             .mapNotNull(toEntity)
+            .toList()
     }
 
     override suspend fun findByMealType(mealType: String): List<RecipeEntry> = transaction {
         Recipes.selectAll()
             .where(Recipes.mealType eq mealType)
             .mapNotNull(toEntity)
+            .toList()
     }
 
 
@@ -80,14 +87,15 @@ class RecipesRepositoryImpl : CrudImplementation<RecipeEntry, Int>(
         (Recipes innerJoin RecipeDiets innerJoin Diets)
             .selectAll()
             .where(Diets.displayName eq diets)
-            .map(toEntity)
-
+            .mapNotNull(toEntity)
+            .toList()
     }
 
     override suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry> = transaction {
         Recipes.selectAll()
             .where(Recipes.kitchenStyle eq kitchenStyle)
             .mapNotNull(toEntity)
+            .toList()
     }
 
 }

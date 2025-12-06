@@ -58,5 +58,6 @@ class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
         IngredientUnits.selectAll()
             .where { IngredientUnits.recipeId eq recipeId }
             .map(toEntity)
+            .toList()
     }
 }

@@ -1,5 +1,5 @@
 #Replace token with new token
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzY0OTU5NDIwLCJ1c2VySWQiOiJhbGljZUBleGFtcGxlLmNvbSJ9.Kmg0-iOJcsWPJkBm5YNzPwo8-NQ3P50P_dHc-ID1CGc
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzY1MTQwMDk2LCJ1c2VySWQiOiJhbGljZUBleGFtcGxlLmNvbSJ9.zXc-6345T1-64HloNgKW1PR0OPWPo91QCaV_uUwvuOM
 @token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYxMzk4NjY4LCJ1c2VySWQiOiIyIn0.0Js7xIPcglS40m_s6lRpE1hDSXC5_jW9kGiAqNXlQ4A
 
 ### get all users
@@ -9,7 +9,7 @@ Authorization: Bearer {{token}}
 ###
 
 ### get user with userId 4
-GET http://127.0.0.1:8080/users/4
+GET http://127.0.0.1:8080/users/alice@example.com
 Content-Type: application/json
 Authorization: Bearer {{token}}
 ###

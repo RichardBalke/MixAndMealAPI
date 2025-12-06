@@ -10,10 +10,11 @@ data class RecipeEntry(
     val id: Int,
     val title: String,
     val description: String,
+    val instructions: String,
     val prepTime: Int,
     val cookingTime: Int,
     val difficulty: Difficulty,
-    val image: String,
+    val image: ByteArray?,
     val mealType: MealType,
     val kitchenStyle: KitchenStyle,
     val favoritesCount: Int

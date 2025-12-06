@@ -33,7 +33,8 @@ class UserDietsRepositoryImpl :
     override suspend fun getDietsForUser(userId: String): List<UserDietEntry> = transaction {
         UserDiets
             .select(UserDiets.userId eq userId)
-            .map(toEntity)
+            .mapNotNull(toEntity)
+            .toList()
     }
 
     override suspend fun addDiet(userId: String, dietId: Int): UserDietEntry {

@@ -1,12 +1,9 @@
 package service
 
 import models.dto.AllergenEntry
-import models.dto.DietEntry
-import models.dto.RecipeDietEntry
-import org.jetbrains.exposed.sql.transactions.transaction
-import repository.RecipeAllergensRepository
+import repository.RecipeAllergensRepositoryImpl
 
-class RecipeAllergenService(val recipeAllergensRepository: RecipeAllergensRepository) {
+class RecipeAllergenService(val recipeAllergensRepository: RecipeAllergensRepositoryImpl) {
     suspend fun getAllergensByRecipeId(recipeId : Int, allergenService : AllergenService): List<AllergenEntry> {
         val recipeAllergens =  recipeAllergensRepository.findAllByRecipeId(recipeId)
         val allergens = mutableListOf<AllergenEntry>()

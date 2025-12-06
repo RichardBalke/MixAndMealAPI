@@ -2,9 +2,9 @@ package service
 
 
 import models.dto.DietEntry
-import repository.RecipeDietsRepository
+import repository.RecipeDietsRepositoryImpl
 
-class RecipeDietsService(private val recipeDietsRepository: RecipeDietsRepository) {
+class RecipeDietsService(private val recipeDietsRepository: RecipeDietsRepositoryImpl) {
     suspend fun getDietsbyRecipeId(recipeID: Int, dietsService: DietsService): List<DietEntry> {
         val recipeDiets =  recipeDietsRepository.findAllByRecipeId(recipeID)
         val diets = mutableListOf<DietEntry>()

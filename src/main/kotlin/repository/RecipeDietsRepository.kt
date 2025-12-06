@@ -28,5 +28,6 @@ class RecipeDietsRepositoryImpl() : CrudImplementation<RecipeDietEntry, RecipeDi
         table.selectAll()
             .where{RecipeDiets.recipeId eq recipeId}
             .map(toEntity)
+            .toList()
     }
 }

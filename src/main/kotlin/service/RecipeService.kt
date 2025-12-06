@@ -1,9 +1,9 @@
 package service
 
-import api.repository.RecipesRepository
+import api.repository.RecipesRepositoryImpl
 import models.dto.RecipeEntry
 
-class RecipeService(private val recipeRepository: RecipesRepository) {
+class RecipeService(private val recipeRepository: RecipesRepositoryImpl) {
 
     fun formatCookingTime(minutes: Int): String {
         val hours = minutes / 60

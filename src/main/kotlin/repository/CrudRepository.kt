@@ -48,6 +48,7 @@ abstract class CrudImplementation<T : Any, ID : Any>(
     override suspend fun findAll(): List<T> = transaction {
         table.selectAll()
             .map(toEntity)
+            .toList()
     }
 
     override suspend fun update(id: ID, entity: T): T = transaction {

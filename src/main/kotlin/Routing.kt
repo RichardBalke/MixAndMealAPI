@@ -3,6 +3,7 @@ package api
 import api.repository.IngredientUnitRepositoryImpl
 import api.repository.RecipesRepository
 import api.repository.RecipesRepositoryImpl
+import api.repository.UserRepositoryImpl
 import api.routes.getFullRecipe
 import api.routes.ingredientsRoutes
 import api.routes.userRoutes
@@ -29,6 +30,7 @@ import service.RecipeAllergenService
 import service.RecipeDietsService
 import service.RecipeService
 import service.UserFridgeService
+import service.UserService
 
 fun Application.configureRouting(
     tokenService: JwtService,
@@ -42,6 +44,7 @@ fun Application.configureRouting(
         val dietsService = DietsService(DietsRepositoryImpl())
         val allergenService = AllergenService(AllergensRepositoryImpl())
         val ingredientUnitService = IngredientUnitService(IngredientUnitRepositoryImpl())
+        val userService = UserService(UserRepositoryImpl())
 
         userRoutes()
         ingredientsRoutes()
@@ -49,7 +52,7 @@ fun Application.configureRouting(
         getFullRecipe(recipeService,recipeDietsService, dietsService, recipeAllergenService, allergenService, ingredientUnitService)
         userFridgeRoutes(UserFridgeService(UserFridgeRepositoryImpl()))
         signUp()
-        signIn(tokenService, tokenConfig)
+        signIn(tokenService, tokenConfig, userService)
         authenticated()
         getSecretInfo()
         get("/") {

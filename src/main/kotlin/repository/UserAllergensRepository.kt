@@ -34,6 +34,7 @@ class UserAllergensRepositoryImpl :
         UserAllergens
             .select(UserAllergens.userId eq userId)
             .map(toEntity)
+            .toList()
     }
 
     override suspend fun addAllergen(userId: String, allergenId: Int): UserAllergenEntry {

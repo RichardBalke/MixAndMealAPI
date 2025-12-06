@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class RecipeSearchResult(
     val recipeId: Int,
     val title: String,
-    val imageUrl: String
+    val imageUrl: ByteArray?
 )

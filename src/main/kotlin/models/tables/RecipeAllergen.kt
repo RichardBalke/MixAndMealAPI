@@ -2,7 +2,7 @@ package models.tables
 
 import org.jetbrains.exposed.sql.Table
 
-object RecipeAllergens : Table(){
+object RecipeAllergens : Table("recipe_allergens") {
     val recipeId = integer("recipe_id").references(Recipes.id)
     val allergenId = integer("allergen_id").references(Allergens.id)
 

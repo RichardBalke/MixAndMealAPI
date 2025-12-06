@@ -28,5 +28,6 @@ class RecipeAllergensRepositoryImpl() : CrudImplementation<RecipeAllergenEntry, 
         RecipeAllergens.selectAll()
             .where { RecipeAllergens.recipeId eq recipeId }
             .map(toEntity)
+            .toList()
     }
 }

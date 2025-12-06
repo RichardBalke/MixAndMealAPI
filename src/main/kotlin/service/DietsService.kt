@@ -1,9 +1,9 @@
 package service
 
 import models.dto.DietEntry
-import repository.DietsRepository
+import repository.DietsRepositoryImpl
 
-class DietsService(private val dietsRepository: DietsRepository) {
+class DietsService(private val dietsRepository: DietsRepositoryImpl) {
     suspend fun getDietById(id: Int) : DietEntry? {
         return dietsRepository.findById(id)
     }
