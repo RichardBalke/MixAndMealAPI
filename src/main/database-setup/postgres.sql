@@ -20,7 +20,7 @@ create table recipes
     difficulty   varchar,
     image        bytea,
     mealtype     varchar,
-    kitchenstyle varchar
+    kitchenstyle varchar,
     favoritescount integer
 );
 
@@ -96,8 +96,8 @@ create table ingredient_units
 
 create table recipe_allergens
 (
-    recipe_id varchar not null references recipes(recipe_id),
-    allergen_id     integer not null references allergens(allergen_id),
+    recipe_id integer not null references recipes(recipe_id),
+    allergen_id integer not null references allergens(allergen_id),
     primary key (recipe_id, allergen_id)
 );
 

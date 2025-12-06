@@ -1,10 +1,12 @@
 package repository
 
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.dto.DietEntry
 import models.tables.Diets
 
-interface DietsRepository {
+interface DietsRepository : CrudRepository<DietEntry, Int> {
+
 }
 
 class DietsRepositoryImpl() : DietsRepository, CrudImplementation<DietEntry, Int>(

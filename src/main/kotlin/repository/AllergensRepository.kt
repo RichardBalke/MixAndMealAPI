@@ -1,10 +1,11 @@
 package repository
 
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.dto.AllergenEntry
 import models.tables.Allergens
 
-interface AllergensRepository {
+interface AllergensRepository : CrudRepository<AllergenEntry, Int> {
 
 }
 

@@ -13,8 +13,50 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import models.dto.IngredientEntry
 import models.dto.RecipeEntry
+import responses.FullRecipeScreenResponse
+import service.AllergenService
+import service.DietsService
+import service.IngredientUnitService
+import service.RecipeAllergenService
+import service.RecipeDietsService
 import service.RecipeService
 import service.requireAdmin
+
+fun Route.getFullRecipe(
+    recipeService: RecipeService,
+    recipeDietService : RecipeDietsService,
+    dietsService: DietsService,
+    recipeAllergenService : RecipeAllergenService,
+    allergenService: AllergenService,
+    ingredientUnitService: IngredientUnitService
+) {
+    route("/fullrecipe") {
+        get("/{recipeId}"){
+            val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
+
+            val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound)
+            val diets = recipeDietService.getDietsbyRecipeId(id, dietsService)
+            val allergens = recipeAllergenService.getAllergensByRecipeId(id, allergenService)
+            val ingredients = ingredientUnitService.getIngredientsByRecipeId(id)
+
+            val fullRecipe = FullRecipeScreenResponse(
+                recipe.id,
+                recipe.title,
+                recipe.description,
+                recipe.prepTime,
+                recipe.cookingTime,
+                recipe.difficulty,
+                recipe.image,
+                recipe.mealType,
+                recipe.kitchenStyle,
+                diets,
+                allergens,
+                ingredients
+            )
+            call.respond(HttpStatusCode.OK, fullRecipe)
+        }
+    }
+}
 
 fun Route.recipesRoutes(recipeRepo : RecipeService) {
 

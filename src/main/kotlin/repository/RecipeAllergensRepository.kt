@@ -1,13 +1,17 @@
 package repository
 
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.dto.RecipeAllergenEntry
 import models.tables.RecipeAllergens
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 
-interface IngredientAllergensRepository {
+interface RecipeAllergensRepository : CrudRepository<RecipeAllergenEntry, RecipeAllergenEntry> {
+    suspend fun findAllByRecipeId(recipeId: Int): List<RecipeAllergenEntry>
 }
 
-class IngredientAllergensRepositoryImpl() : CrudImplementation<RecipeAllergenEntry, RecipeAllergenEntry>
+class RecipeAllergensRepositoryImpl() : CrudImplementation<RecipeAllergenEntry, RecipeAllergenEntry>
     (
         table = RecipeAllergens,
         toEntity = { row ->
@@ -18,4 +22,11 @@ class IngredientAllergensRepositoryImpl() : CrudImplementation<RecipeAllergenEnt
         entityMapper = {stmt, ingredientAllergen ->
             stmt[RecipeAllergens.recipeId] = ingredientAllergen.recipeId
             stmt[RecipeAllergens.allergenId] = ingredientAllergen.allergenId
-        }), IngredientAllergensRepository { }
+        }), RecipeAllergensRepository {
+
+    override suspend fun findAllByRecipeId(recipeId: Int): List<RecipeAllergenEntry> = transaction{
+        RecipeAllergens.selectAll()
+            .where { RecipeAllergens.recipeId eq recipeId }
+            .map(toEntity)
+    }
+}

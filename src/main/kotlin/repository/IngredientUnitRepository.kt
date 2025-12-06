@@ -7,8 +7,9 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import responses.RecipeSearchResult
 
-interface IngredientUnitRepository {
+interface IngredientUnitRepository : CrudRepository<IngredientUnitEntry, IngredientUnitEntry> {
  suspend fun findRecipesByIngredient(ingredientName : String): List<RecipeSearchResult>
+ suspend fun findAllByRecipeId(recipeId : Int): List<IngredientUnitEntry>
 }
 
 class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
@@ -51,5 +52,11 @@ class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
             foundRecipes.addAll(search)
         }
         return foundRecipes
+    }
+
+    override suspend fun findAllByRecipeId(recipeId: Int): List<IngredientUnitEntry> = transaction {
+        IngredientUnits.selectAll()
+            .where { IngredientUnits.recipeId eq recipeId }
+            .map(toEntity)
     }
 }
