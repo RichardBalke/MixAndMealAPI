@@ -2,9 +2,9 @@ package models.tables
 
 import org.jetbrains.exposed.sql.Table
 
-object RecipeAllergen : Table(){
-    val recipeId = integer("recipe_id").references(Recipe.id)
-    val allergenId = integer("allergen_id").references(Allergen.id)
+object RecipeAllergens : Table("recipe_allergens") {
+    val recipeId = integer("recipe_id").references(Recipes.id)
+    val allergenId = integer("allergen_id").references(Allergens.id)
 
     override val primaryKey = PrimaryKey(recipeId, allergenId)
 }

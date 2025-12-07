@@ -1,20 +1,33 @@
 package repository
 
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.dto.RecipeDietEntry
-import models.tables.RecipeDiet
+import models.tables.RecipeDiets
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 
-interface RecipeDietsRepository {
+interface RecipeDietsRepository : CrudRepository<RecipeDietEntry, RecipeDietEntry> {
+    suspend fun findAllByRecipeId(recipeId: Int): List<RecipeDietEntry>
 }
 
 class RecipeDietsRepositoryImpl() : CrudImplementation<RecipeDietEntry, RecipeDietEntry>(
-    table = RecipeDiet,
+    table = RecipeDiets,
     toEntity = {row ->
-        RecipeDietEntry(row[RecipeDiet.recipeId], row[RecipeDiet.dietId])},
-    idColumns = listOf(RecipeDiet.recipeId, RecipeDiet.dietId),
+        RecipeDietEntry(row[RecipeDiets.recipeId], row[RecipeDiets.dietId])},
+    idColumns = listOf(RecipeDiets.recipeId, RecipeDiets.dietId),
     idExtractor = { entry -> listOf(entry.recipeId, entry.dietId) },
     entityMapper = { stmt, recipeDiet ->
-        stmt[RecipeDiet.recipeId] = recipeDiet.recipeId
-        stmt[RecipeDiet.dietId] = recipeDiet.dietId
+        stmt[RecipeDiets.recipeId] = recipeDiet.recipeId
+        stmt[RecipeDiets.dietId] = recipeDiet.dietId
     }
-), RecipeDietsRepository {}
+), RecipeDietsRepository {
+
+    override suspend fun findAllByRecipeId(recipeId : Int): List<RecipeDietEntry> = transaction {
+        table.selectAll()
+            .where{RecipeDiets.recipeId eq recipeId}
+            .map(toEntity)
+            .toList()
+    }
+}

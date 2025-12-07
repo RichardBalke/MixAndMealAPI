@@ -8,33 +8,38 @@ import service.UserFridgeService
 import models.dto.UserFridgeEntry
 import io.ktor.server.routing.Route
 import io.ktor.http.*
+import io.ktor.server.auth.authenticate
 
 fun Route.userFridgeRoutes(userFridgeService: UserFridgeService) {
+//    authenticate {
+        route("/fridge") {
 
-    route("/fridge") {
 
-        get("/{userId}") {
-            val userId = call.parameters["userId"] ?: return@get call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val fridge: List<UserFridgeEntry> = userFridgeService.getUserFridgeEntries(userId)
-            call.respond(fridge)
-        }
-
-        post("/{userId}/ingredient") {
-            val userId = call.parameters["userId"] ?: return@post call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val ingredient = call.receive<Map<String, String>>()["ingredientName"]
-                ?: return@post call.respondText("Missing ingredientName", status = HttpStatusCode.BadRequest)
-
-            try {
-                val entry = userFridgeService.addUserFridgeEntry(
-                    UserFridgeEntry(userId = userId, ingredientName = ingredient)
+            get("/{userId}") {
+                val userId = call.parameters["userId"] ?: return@get call.respondText(
+                    "Missing userId", status = HttpStatusCode.BadRequest
                 )
-                call.respond(HttpStatusCode.Created, entry)
-            } catch (e: IllegalArgumentException) {
-                call.respond(HttpStatusCode.Conflict, e.message ?: "Ingredient already exists")
+                val fridge: List<UserFridgeEntry> = userFridgeService.getUserFridgeEntries(userId)
+                if (fridge.isEmpty()) call.respondText("Not found", status = HttpStatusCode.Conflict)
+                call.respond(fridge)
+
+
+                post("/ingredient") {
+                    val userId = call.parameters["userId"] ?: return@post call.respondText(
+                        "Missing userId", status = HttpStatusCode.BadRequest
+                    )
+                    val ingredient = call.receive<Map<String, String>>()["ingredientName"]
+                        ?: return@post call.respondText("Missing ingredientName", status = HttpStatusCode.BadRequest)
+
+                    try {
+                        val entry = userFridgeService.addUserFridgeEntry(
+                            UserFridgeEntry(userId = userId, ingredientName = ingredient)
+                        )
+                        call.respond(HttpStatusCode.Created, entry)
+                    } catch (e: IllegalArgumentException) {
+                        call.respond(HttpStatusCode.Conflict, e.message ?: "Ingredient already exists")
+                    }
+                }
             }
         }
 
@@ -48,5 +53,6 @@ fun Route.userFridgeRoutes(userFridgeService: UserFridgeService) {
             userFridgeService.removeUserFridgeEntry(userId, ingredient)
             call.respond(HttpStatusCode.NoContent)
         }
-    }
+//    }
+
 }

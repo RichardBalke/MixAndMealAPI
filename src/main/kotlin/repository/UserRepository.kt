@@ -2,7 +2,7 @@ package api.repository
 
 import api.models.Role
 import models.dto.UserEntry
-import models.tables.User
+import models.tables.Users
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -14,37 +14,37 @@ interface UserRepository {
 }
 
 class UserRepositoryImpl : UserRepository, CrudImplementation<UserEntry, String>(
-    table = User,
+    table = Users,
     toEntity = { row ->
-        val roleString = row[User.role]
+        val roleString = row[Users.role]
         val roleEnum = Role.valueOf(roleString)
-        UserEntry(row[User.name], row[User.email], row[User.password], roleEnum) },
-    idColumns = listOf(User.email),
+        UserEntry(row[Users.name], row[Users.email], row[Users.password], roleEnum) },
+    idColumns = listOf(Users.email),
     idExtractor = {entry -> listOf(entry)},
     entityMapper = { stmt, user ->
-        stmt[User.name] = user.name
-        stmt[User.email] = user.email
-        stmt[User.password] = user.password
-        stmt[User.role] = user.role.name
+        stmt[Users.name] = user.name
+        stmt[Users.email] = user.email
+        stmt[Users.password] = user.password
+        stmt[Users.role] = user.role.name
     }
 ) {
     override suspend fun findByUsername(username: String): UserEntry? = transaction {
-        User.selectAll()
-            .where { User.name eq username }
+        Users.selectAll()
+            .where { Users.name eq username }
             .mapNotNull(toEntity)
             .singleOrNull()
     }
     override suspend fun findByEmail(email: String): UserEntry? = transaction {
-        User.selectAll()
-            .where { User.email eq email }
+        Users.selectAll()
+            .where { Users.email eq email }
             .mapNotNull(toEntity)
             .singleOrNull()
     }
 
     override suspend fun getRoleById(id: String): Role {
         val user = transaction {
-            User.selectAll()
-                .where { User.email eq id }
+            Users.selectAll()
+                .where { Users.email eq id }
                 .mapNotNull(toEntity)
                 .single()
         }

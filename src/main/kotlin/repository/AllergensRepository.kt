@@ -1,26 +1,27 @@
 package repository
 
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.dto.AllergenEntry
-import models.tables.Allergen
+import models.tables.Allergens
 
-interface AllergensRepository {
+interface AllergensRepository : CrudRepository<AllergenEntry, Int> {
 
 }
 
 class AllergensRepositoryImpl() : AllergensRepository, CrudImplementation<AllergenEntry, Int>(
-    table = Allergen,
-    toEntity = { row -> AllergenEntry(row[Allergen.id],
-        row[Allergen.name],
-        row[Allergen.description],
-        row[Allergen.description]) },
-    idColumns = listOf(Allergen.id),
+    table = Allergens,
+    toEntity = { row -> AllergenEntry(row[Allergens.id],
+        row[Allergens.name],
+        row[Allergens.description],
+        row[Allergens.description]) },
+    idColumns = listOf(Allergens.id),
     idExtractor = {entry -> listOf(entry)},
     entityMapper = { stmt, allergen ->
-        stmt[Allergen.id] = allergen.id
-        stmt[Allergen.name] = allergen.name
-        stmt[Allergen.displayName] = allergen.displayName
-        stmt[Allergen.description] = allergen.description
+        stmt[Allergens.id] = allergen.id
+        stmt[Allergens.name] = allergen.name
+        stmt[Allergens.displayName] = allergen.displayName
+        stmt[Allergens.description] = allergen.description
     }
 ) {
 

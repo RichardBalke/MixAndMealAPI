@@ -13,21 +13,66 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import models.dto.IngredientEntry
 import models.dto.RecipeEntry
+import responses.FullRecipeScreenResponse
+import service.AllergenService
+import service.DietsService
+import service.IngredientUnitService
+import service.RecipeAllergenService
+import service.RecipeDietsService
+import service.RecipeService
 import service.requireAdmin
 
-fun Route.recipesRoutes() {
-    val recipeRepo = RecipesRepositoryImpl()
+fun Route.getFullRecipe(
+    recipeService: RecipeService,
+    recipeDietService : RecipeDietsService,
+    dietsService: DietsService,
+    recipeAllergenService : RecipeAllergenService,
+    allergenService: AllergenService,
+    ingredientUnitService: IngredientUnitService
+) {
+    route("/fullrecipe") {
+        get("/{recipeId}"){
+            val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
+
+            val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Recipe not found")
+            val diets = recipeDietService.getDietsbyRecipeId(id, dietsService) ?: return@get call.respond(HttpStatusCode.NotFound, "Diets not found")
+            val allergens = recipeAllergenService.getAllergensByRecipeId(id, allergenService) ?: return@get call.respond(HttpStatusCode.NotFound, "Allergens not found")
+            val ingredients = ingredientUnitService.getIngredientsByRecipeId(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Ingredients not found")
+
+            val fullRecipe = FullRecipeScreenResponse(
+                recipe.id,
+                recipe.title,
+                recipe.description,
+                recipe.instructions,
+                recipe.prepTime,
+                recipe.cookingTime,
+                recipe.difficulty,
+                recipe.image,
+                recipe.mealType,
+                recipe.kitchenStyle,
+                diets,
+                allergens,
+                ingredients
+            )
+            call.respond(HttpStatusCode.OK, fullRecipe)
+        }
+    }
+}
+
+fun Route.recipesRoutes(recipeService: RecipeService) {
+
     route("/recipes") {
 
         // Get all recipes
         get {
+            val recipeRepo = RecipesRepositoryImpl()
             call.respond(recipeRepo.findAll())
         }
-        authenticate {
+//        authenticate {
             post {
                 if(call.requireAdmin()){
                     val request = call.receive<RecipeEntry>()
-                    val created = recipeRepo.create(request)
+                    val created = recipeService.addRecipes(request)
                     call.respond(HttpStatusCode.Created, created)
                 } else {
                     call.respond(HttpStatusCode.Unauthorized)
@@ -38,6 +83,7 @@ fun Route.recipesRoutes() {
 
         //Get recipes by title
         get("/title/{title}") {
+            val recipeRepo = RecipesRepositoryImpl()
             val name = call.parameters["title"].toString()
             val title = recipeRepo.findByTitle(name)
             if (title == null) {
@@ -131,8 +177,8 @@ fun Route.recipesRoutes() {
 
             // controleert of de user met 'id' bestaat
 //                val recipe = FakeRecipeRepository.recipeService.findById(id)
-            val recipe = recipeRepo.findById(id)
-                ?: return@get call.respond(HttpStatusCode.NotFound)
+            val recipe = recipeService.getRecipe(id)
+                ?: return@get call.respond(HttpStatusCode.BadGateway, "Recipe not found")
 
             call.respond(HttpStatusCode.OK, recipe)
         }
@@ -144,7 +190,7 @@ fun Route.recipesRoutes() {
                     val id: Int = call.parameters["id"]?.toIntOrNull()
                         ?: return@delete call.respond(HttpStatusCode.BadRequest)
 
-                    val succes = recipeRepo.delete(id)
+                    val succes = recipeService.deleteRecipe(id)
                     if (succes) {
                         call.respond(HttpStatusCode.OK, "Recipe with id: $id succesfully deleted.")
                     } else {
@@ -198,6 +244,6 @@ fun Route.recipesRoutes() {
                 call.respond(HttpStatusCode.NotFound)
             }
 
-        }
+//        }
     }
 }

@@ -2,7 +2,7 @@ package models.tables
 
 import org.jetbrains.exposed.sql.Table
 
-object User: Table() {
+object Users: Table() {
     val name = varchar("name", 255)
     val email = varchar("email", 255).uniqueIndex()
     val password = varchar("password", 255)

@@ -14,8 +14,10 @@ import models.dto.TokenClaim
 import models.dto.TokenConfig
 import models.dto.UserEntry
 import requests.AuthRequest
+import requests.Login
 import responses.AuthResponse
 import service.JwtService
+import service.UserService
 import service.requireAdmin
 
 
@@ -39,8 +41,6 @@ fun Route.signUp(){
             call.respond(HttpStatusCode.Conflict, "User already exists")
         }
 
-        val userCount = userRepo.findAll().count()
-
         val user = UserEntry(
             name = request.username,
             password = request.password,
@@ -55,16 +55,18 @@ fun Route.signUp(){
 
 fun Route.signIn(
     tokenService: JwtService,
-    tokenConfig : TokenConfig
+    tokenConfig : TokenConfig,
+    userService : UserService
 ){
-    val userRepo = UserRepositoryImpl()
+//    val userRepo = UserRepositoryImpl()
     post("/signin"){
-        val request = call.receiveNullable<AuthRequest>() ?: kotlin.run{
-            call.respond(HttpStatusCode.BadRequest)
+        val request = call.receiveNullable<Login>()
+        if(request == null){
+        call.respond(HttpStatusCode.BadRequest)
             return@post
         }
 
-        val user = userRepo.findByUsername(request.username)
+        val user = userService.getByEmail(request.email)
         if(user == null){
             call.respond(HttpStatusCode.Unauthorized)
             return@post
@@ -73,7 +75,7 @@ fun Route.signIn(
         val isValidPassword = request.password == user.password
 
         if(!isValidPassword){
-            call.respond(HttpStatusCode.Unauthorized, "Incorrect username or password")
+            call.respond(HttpStatusCode.Unauthorized, "Incorrect email or password")
             return@post
         }
 

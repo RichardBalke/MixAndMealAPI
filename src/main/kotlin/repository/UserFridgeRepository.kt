@@ -34,7 +34,7 @@ class UserFridgeRepositoryImpl :
     override suspend fun getFridgeForUser(userId: String): List<UserFridgeEntry> = transaction {
         UserFridge
             .selectAll()
-            .where(UserFridge.userId eq userId)
+            .where (UserFridge.userId eq userId)
             .map(toEntity)
     }
 

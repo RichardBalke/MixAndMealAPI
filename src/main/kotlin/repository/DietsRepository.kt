@@ -1,22 +1,24 @@
 package repository
 
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.dto.DietEntry
-import models.tables.Diet
+import models.tables.Diets
 
-interface DietsRepository {
+interface DietsRepository : CrudRepository<DietEntry, Int> {
+
 }
 
 class DietsRepositoryImpl() : DietsRepository, CrudImplementation<DietEntry, Int>(
-    table = Diet,
+    table = Diets,
     toEntity = {row ->
-        DietEntry(row[Diet.id], row[Diet.displayName], row[Diet.description])
+        DietEntry(row[Diets.id], row[Diets.displayName], row[Diets.description])
     },
-    idColumns = listOf(Diet.id),
+    idColumns = listOf(Diets.id),
     idExtractor = {entry -> listOf(entry)},
     entityMapper = {stmt, diet ->
-        stmt[Diet.id] = diet.id
-        stmt[Diet.displayName] = diet.displayName
-        stmt[Diet.description] = diet.description
+        stmt[Diets.id] = diet.id
+        stmt[Diets.displayName] = diet.displayName
+        stmt[Diets.description] = diet.description
     }
 ) {}

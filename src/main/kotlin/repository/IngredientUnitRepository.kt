@@ -1,55 +1,63 @@
 package api.repository
 
 import models.dto.IngredientUnitEntry
-import models.tables.IngredientUnit
-import models.tables.Recipe
+import models.tables.IngredientUnits
+import models.tables.Recipes
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import responses.RecipeSearchResult
 
-interface IngredientUnitRepository {
+interface IngredientUnitRepository : CrudRepository<IngredientUnitEntry, IngredientUnitEntry> {
  suspend fun findRecipesByIngredient(ingredientName : String): List<RecipeSearchResult>
+ suspend fun findAllByRecipeId(recipeId : Int): List<IngredientUnitEntry>
 }
 
 class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
     CrudImplementation<IngredientUnitEntry, IngredientUnitEntry>(
-    table = IngredientUnit,
+    table = IngredientUnits,
     toEntity = { row ->
-        IngredientUnitEntry(row[IngredientUnit.recipeId],
-            row[IngredientUnit.ingredientName],
-            row[IngredientUnit.amount],
-            row[IngredientUnit.unitType]
+        IngredientUnitEntry(row[IngredientUnits.recipeId],
+            row[IngredientUnits.ingredientName],
+            row[IngredientUnits.amount],
+            row[IngredientUnits.unitType]
         )},
-    idColumns = listOf(IngredientUnit.recipeId, IngredientUnit.ingredientName),
+    idColumns = listOf(IngredientUnits.recipeId, IngredientUnits.ingredientName),
     idExtractor = {entry -> listOf(entry.recipeId, entry.ingredientName)},
     entityMapper = { stmt, ingredientUnit ->
-        stmt[IngredientUnit.recipeId] = ingredientUnit.recipeId
-        stmt[IngredientUnit.ingredientName] = ingredientUnit.ingredientName
-        stmt[IngredientUnit.amount] = ingredientUnit.amount
-        stmt[IngredientUnit.unitType] = ingredientUnit.unitType
+        stmt[IngredientUnits.recipeId] = ingredientUnit.recipeId
+        stmt[IngredientUnits.ingredientName] = ingredientUnit.ingredientName
+        stmt[IngredientUnits.amount] = ingredientUnit.amount
+        stmt[IngredientUnits.unitType] = ingredientUnit.unitType
     }
 ) {
     override suspend fun findRecipesByIngredient(ingredientName: String): List<RecipeSearchResult> {
         val recipeIds = transaction {
-            IngredientUnit.selectAll()
-                .where { IngredientUnit.ingredientName like ingredientName }
-                .map { row -> row[IngredientUnit.recipeId] }
+            IngredientUnits.selectAll()
+                .where { IngredientUnits.ingredientName like ingredientName }
+                .map { row -> row[IngredientUnits.recipeId] }
         }
         val foundRecipes = mutableListOf<RecipeSearchResult>()
         for (recipe in recipeIds) {
             val search = transaction {
-                Recipe.selectAll()
-                    .where { Recipe.id eq recipe }
+                Recipes.selectAll()
+                    .where { Recipes.id eq recipe }
                     .map { row ->
                         RecipeSearchResult(
-                            row[Recipe.id],
-                            row[Recipe.title],
-                            row[Recipe.image]
+                            row[Recipes.id],
+                            row[Recipes.title],
+                            row[Recipes.image]
                         )
                     }
             }
             foundRecipes.addAll(search)
         }
         return foundRecipes
+    }
+
+    override suspend fun findAllByRecipeId(recipeId: Int): List<IngredientUnitEntry> = transaction {
+        IngredientUnits.selectAll()
+            .where { IngredientUnits.recipeId eq recipeId }
+            .map(toEntity)
+            .toList()
     }
 }

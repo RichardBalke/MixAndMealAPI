@@ -2,6 +2,7 @@ package service
 
 import models.dto.UserFridgeEntry
 import repository.UserFridgeRepository
+import repository.UserFridgeRepositoryImpl
 
 class UserFridgeService(private val userFridgeRepository: UserFridgeRepository) {
 

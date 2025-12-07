@@ -1,30 +1,30 @@
 insert into users (name, email, password, role) values
-    ('Alice Johnson',   'alice@example.com',   'pass123',    'user'),
-    ('Bob Smith',       'bob@example.com',     'secret456',  'user'),
-    ('Charlie Green',   'charlie@example.com', 'charlie789', 'user'),
-    ('Diana Carter',    'diana@example.com',   'diana111',   'user'),
-    ('Ethan Brooks',    'ethan@example.com',   'ethan222',   'user'),
-    ('Fiona White',     'fiona@example.com',   'fiona333',   'user'),
-    ('George Hill',     'george@example.com',  'george444',  'user'),
-    ('Hannah Reed',     'hannah@example.com',  'hannah555',  'user'),
-    ('Ian Black',       'ian@example.com',     'ian666',     'user'),
-    ('Julia Stone',     'julia@example.com',   'julia777',   'user'),
-    ('Bart',     'bart@example.com',   'admin123',   'admin'),
-    ('Fauve',     'fauve@example.com',   'admin123',   'admin'),
-    ('Richard',     'richard@example.com',   'admin123',   'admin'),
-    ('Yoran',     'yoran@example.com',   'admin123',   'admin');
+    ('Alice Johnson',   'alice@example.com',   'pass123',    'USER'),
+    ('Bob Smith',       'bob@example.com',     'secret456',  'USER'),
+    ('Charlie Green',   'charlie@example.com', 'charlie789', 'USER'),
+    ('Diana Carter',    'diana@example.com',   'diana111',   'USER'),
+    ('Ethan Brooks',    'ethan@example.com',   'ethan222',   'USER'),
+    ('Fiona White',     'fiona@example.com',   'fiona333',   'USER'),
+    ('George Hill',     'george@example.com',  'george444',  'USER'),
+    ('Hannah Reed',     'hannah@example.com',  'hannah555',  'USER'),
+    ('Ian Black',       'ian@example.com',     'ian666',     'USER'),
+    ('Julia Stone',     'julia@example.com',   'julia777',   'USER'),
+    ('Bart',     'bart@example.com',   'admin123',   'ADMIN'),
+    ('Fauve',     'fauve@example.com',   'admin123',   'ADMIN'),
+    ('Richard',     'richard@example.com',   'admin123',   'ADMIN'),
+    ('Yoran',     'yoran@example.com',   'admin123',   'ADMIN');
 
-insert into recipes (recipe_id, title, description, preptime, cookingtime, difficulty, image, mealtype, kitchenstyle) values
-    (1, 'Spaghetti Bolognese', 'Classic Italian pasta with meat sauce.', 15, 45, 'medium', NULL, 'dinner', 'Italian'),
-    (2, 'Vegetable Stir Fry',  'Quick and healthy mixed vegetable stir fry.', 10, 15, 'easy', NULL, 'lunch', 'Asian'),
-    (3, 'Chicken Curry',       'Aromatic curry with chicken and basmati rice.', 20, 40, 'medium', NULL, 'dinner', 'Indian'),
-    (4, 'Avocado Toast',       'Simple toast topped with fresh avocado.', 5, 5, 'easy', NULL, 'breakfast', 'American'),
-    (5, 'Beef Tacos',          'Seasoned beef with fresh taco toppings.', 20, 10, 'easy', NULL, 'dinner', 'Mexican'),
-    (6, 'Greek Salad',         'Fresh salad with feta cheese and olives.', 10, 0, 'easy', NULL, 'lunch', 'Greek'),
-    (7, 'Pancakes',            'Fluffy breakfast pancakes with syrup.', 10, 15, 'easy', NULL, 'breakfast', 'American'),
-    (8, 'Sushi Rolls',         'Rice rolls with fish and vegetables.', 25, 0, 'hard', NULL, 'dinner', 'Japanese'),
-    (9, 'Lentil Soup',         'Hearty vegetarian lentil soup.', 15, 35, 'easy', NULL, 'dinner', 'Mediterranean'),
-    (10,'Salmon Teriyaki',     'Grilled salmon with teriyaki glaze.', 15, 20, 'medium', NULL, 'dinner', 'Japanese');
+insert into recipes (recipe_id, title, description, instructions, preptime, cookingtime, difficulty, image, mealtype, kitchenstyle, favoritescount) values
+    (1, 'Spaghetti Bolognese', 'Classic Italian pasta with meat sauce.', 'instructions needed', 15, 45, 'medium', NULL, 'dinner', 'Italian', 0),
+    (2, 'Vegetable Stir Fry',  'Quick and healthy mixed vegetable stir fry.', 'instructions needed', 10, 15, 'easy', NULL, 'lunch', 'Asian', 0),
+    (3, 'Chicken Curry',       'Aromatic curry with chicken and basmati rice.', 'instructions needed', 20, 40, 'medium', NULL, 'dinner', 'Indian', 0),
+    (4, 'Avocado Toast',       'Simple toast topped with fresh avocado.', 'instructions needed', 5, 5, 'easy', NULL, 'breakfast', 'American', 0),
+    (5, 'Beef Tacos',          'Seasoned beef with fresh taco toppings.', 'instructions needed', 20, 10, 'easy', NULL, 'dinner', 'Mexican', 0),
+    (6, 'Greek Salad',         'Fresh salad with feta cheese and olives.', 'instructions needed', 10, 0, 'easy', NULL, 'lunch', 'Greek', 0),
+    (7, 'Pancakes',            'Fluffy breakfast pancakes with syrup.', 'instructions needed', 10, 15, 'easy', NULL, 'breakfast', 'American', 0),
+    (8, 'Sushi Rolls',         'Rice rolls with fish and vegetables.', 'instructions needed', 25, 0, 'hard', NULL, 'dinner', 'Japanese', 0),
+    (9, 'Lentil Soup',         'Hearty vegetarian lentil soup.', 'instructions needed', 15, 35, 'easy', NULL, 'dinner', 'Mediterranean', 0),
+    (10,'Salmon Teriyaki',     'Grilled salmon with teriyaki glaze.', 'instructions needed', 15, 20, 'medium', NULL, 'dinner', 'Japanese', 0);
 
 insert into ingredients (name, description) values
     ('Tomato', 'Fresh red tomatoes.'),
@@ -199,12 +199,12 @@ insert into ingredient_units (recipe_id, ingredient_name, amount, unittype) valu
     (10, 'Teriyaki Sauce', 3, 'tbsp'),
     (10, 'Rice', 150, 'grams');
 
-insert into ingredient_allergens (ingredient_name, allergen_id) values
-    ('Spaghetti', 1),
-    ('Bread', 1),
-    ('Soy Sauce', 6),
-    ('Feta Cheese', 7),
-    ('Eggs', 3),
-    ('Salmon', 4),
-    ('Tortilla', 1),
-    ('Pancake Mix', 1);
+insert into recipe_allergens (recipe_id, allergen_id) values
+    (1, 1),
+    (4, 1),
+    (3, 6),
+    (2, 7),
+    (1, 3),
+    (2, 4),
+    (7, 1),
+    (5, 1);

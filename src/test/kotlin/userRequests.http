@@ -1,5 +1,5 @@
 #Replace token with new token
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYzNjYxMzI0LCJ1c2VySWQiOiIxIn0.F9fp2hvILrFOPwW6jgpwkn-bq6ACKsUPSAWsx-wJkFc
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzY1MTQwMDk2LCJ1c2VySWQiOiJhbGljZUBleGFtcGxlLmNvbSJ9.zXc-6345T1-64HloNgKW1PR0OPWPo91QCaV_uUwvuOM
 @token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYxMzk4NjY4LCJ1c2VySWQiOiIyIn0.0Js7xIPcglS40m_s6lRpE1hDSXC5_jW9kGiAqNXlQ4A
 
 ### get all users
@@ -9,7 +9,7 @@ Authorization: Bearer {{token}}
 ###
 
 ### get user with userId 4
-GET http://127.0.0.1:8080/users/4
+GET http://127.0.0.1:8080/users/alice@example.com
 Content-Type: application/json
 Authorization: Bearer {{token}}
 ###
@@ -19,9 +19,8 @@ POST http://127.0.0.1:8080/signin
 Content-Type: application/json
 
 {
-  "username": "Bla",
-  "password": "Test1",
-  "email": "bla@test.nl"
+  "email": "alice@example.com",
+  "password": "pass123"
 }
 ###
 
@@ -30,9 +29,8 @@ POST http://127.0.0.1:8080/signin
 Content-Type: application/json
 
 {
-  "username": "Fauve",
-  "email": "test2@test.nl",
-  "password": "Test2"
+  "email": "bla@test.nl",
+  "password": "Test1"
 }
 ###
 
@@ -142,11 +140,13 @@ Authorization: Bearer {{token}}
   "description": "Bevat gluten uit tarwe, rogge, gerst, haver, spelt of kamut"
 }
 
-### get fridge for user
+###
 GET http://127.0.0.1:8080/fridge/alice@example.com
 
-###
-POST http://127.0.0.1:8080/fridge/alice@example.com/Tomato
 
 ###
-DELETE http://127.0.0.1:8080/fridge/alice@example.com/Spaghetti
+POST http://127.0.0.1:8080/fridge/alice@example.com
+
+{
+    "ingredientName": "Tomato"
+}
