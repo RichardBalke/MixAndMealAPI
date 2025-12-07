@@ -29,7 +29,8 @@ fun Application.module() {
 
 fun Application.initDatabase() {
     Database.connect(
-        url = "jdbc:postgresql://docker-db-1",
+//        url = "jdbc:postgresql://docker-db-1",
+        url = "jdbc:postgresql://localhost:5432/postgres",
         driver = "org.postgresql.Driver",
         user = "postgres",
         password = "admin"

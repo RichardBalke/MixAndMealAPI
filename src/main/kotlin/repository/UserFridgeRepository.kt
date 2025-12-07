@@ -4,6 +4,7 @@ import models.dto.UserFridgeEntry
 import api.repository.CrudImplementation
 import models.tables.UserFridge
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface UserFridgeRepository {
@@ -32,7 +33,8 @@ class UserFridgeRepositoryImpl :
 
     override suspend fun getFridgeForUser(userId: String): List<UserFridgeEntry> = transaction {
         UserFridge
-            .select(UserFridge.userId eq userId)
+            .selectAll()
+            .where(UserFridge.userId eq userId)
             .map(toEntity)
     }
 

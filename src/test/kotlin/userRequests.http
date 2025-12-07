@@ -141,3 +141,12 @@ Authorization: Bearer {{token}}
   "displayName": "Glutenbevattende granen",
   "description": "Bevat gluten uit tarwe, rogge, gerst, haver, spelt of kamut"
 }
+
+### get fridge for user
+GET http://127.0.0.1:8080/fridge/alice@example.com
+
+###
+POST http://127.0.0.1:8080/fridge/alice@example.com/Tomato
+
+###
+DELETE http://127.0.0.1:8080/fridge/alice@example.com/Spaghetti
