@@ -1,5 +1,5 @@
 #Replace token with new token
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzY1MTQwMDk2LCJ1c2VySWQiOiJhbGljZUBleGFtcGxlLmNvbSJ9.zXc-6345T1-64HloNgKW1PR0OPWPo91QCaV_uUwvuOM
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzY1MzAyODQwLCJ1c2VySWQiOiJiYXJ0QGV4YW1wbGUuY29tIn0.Ff1A8UdzCwdQTdrl--A_QYg8v7SGgzee5yZUPoQAMhE
 @token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYxMzk4NjY4LCJ1c2VySWQiOiIyIn0.0Js7xIPcglS40m_s6lRpE1hDSXC5_jW9kGiAqNXlQ4A
 
 ### get all users
@@ -29,8 +29,8 @@ POST http://127.0.0.1:8080/signin
 Content-Type: application/json
 
 {
-  "email": "bla@test.nl",
-  "password": "Test1"
+  "email": "bart@example.com",
+  "password": "admin123"
 }
 ###
 

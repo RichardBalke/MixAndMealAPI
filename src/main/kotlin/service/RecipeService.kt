@@ -2,6 +2,9 @@ package service
 
 import api.repository.RecipesRepositoryImpl
 import models.dto.RecipeEntry
+import models.tables.Recipes
+import repository.RecipeAllergensRepositoryImpl
+import requests.RecipeSearchRequest
 
 class RecipeService(private val recipeRepository: RecipesRepositoryImpl) {
 
@@ -9,6 +12,42 @@ class RecipeService(private val recipeRepository: RecipesRepositoryImpl) {
         val hours = minutes / 60
         val minutes = minutes % 60
         return "${hours}h ${minutes}m"
+    }
+
+    suspend fun searchRecipes(request: RecipeSearchRequest): List<RecipeEntry> {
+        val recipes = mutableSetOf<RecipeEntry>()
+        if(request.partialTitle.isNotBlank()){
+            recipes.addAll(findByTitle(request.partialTitle))
+        }
+        if(request.difficulty.isNotBlank()){
+            recipes.addAll(findByDifficulty(request.difficulty))
+        }
+        if(request.mealType.isNotBlank()){
+            recipes.addAll(findByMealType(request.mealType))
+        }
+        if(request.kitchenStyle.isNotBlank()){
+            recipes.addAll(findByKitchenStyle(request.kitchenStyle))
+        }
+//        if(request.maxCookingTime != 0){
+//            TODO("create function to get recipes with les then max cooking time")
+//        }
+        if(request.diets.isNotEmpty()){
+            for(diet in request.diets){
+                recipes.addAll(findByDiets(diet))
+            }
+        }
+        if(request.allergens.isNotEmpty()){
+            for(allergen in request.allergens){
+                val recipeAllergenService = RecipeAllergenService(RecipeAllergensRepositoryImpl())
+                recipes.addAll(recipeAllergenService.getRecipesByAllergenId(allergen, this))
+            }
+        }
+//        if(request.ingredients.isNotEmpty()){
+//            TODO("create function to get recipes with ingredients")
+//        }
+
+
+        return recipes.toList()
     }
 
     suspend fun getAllRecipes(): List<RecipeEntry> {

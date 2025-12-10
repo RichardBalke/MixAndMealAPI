@@ -45,7 +45,10 @@ class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
                         RecipeSearchResult(
                             row[Recipes.id],
                             row[Recipes.title],
-                            row[Recipes.image]
+                            row[Recipes.description],
+                            row[Recipes.cookingTime],
+                            row[Recipes.image],
+                            0.0
                         )
                     }
             }

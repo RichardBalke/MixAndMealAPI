@@ -6,6 +6,7 @@ import api.repository.RecipesRepositoryImpl
 import api.repository.UserRepositoryImpl
 import api.routes.getFullRecipe
 import api.routes.ingredientsRoutes
+import api.routes.recipeSearchResults
 import api.routes.userRoutes
 import api.routes.recipesRoutes
 import api.routes.userFridgeRoutes
@@ -49,6 +50,7 @@ fun Application.configureRouting(
         userRoutes()
         ingredientsRoutes()
         recipesRoutes(recipeService)
+        recipeSearchResults(recipeService)
         getFullRecipe(recipeService,recipeDietsService, dietsService, recipeAllergenService, allergenService, ingredientUnitService)
         userFridgeRoutes(UserFridgeService(UserFridgeRepositoryImpl()))
         signUp()

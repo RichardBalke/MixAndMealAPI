@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 interface RecipeAllergensRepository : CrudRepository<RecipeAllergenEntry, RecipeAllergenEntry> {
     suspend fun findAllByRecipeId(recipeId: Int): List<RecipeAllergenEntry>
+    suspend fun findAllByAllergenId(allergenId: Int) : List<RecipeAllergenEntry>
 }
 
 class RecipeAllergensRepositoryImpl() : CrudImplementation<RecipeAllergenEntry, RecipeAllergenEntry>
@@ -25,9 +26,16 @@ class RecipeAllergensRepositoryImpl() : CrudImplementation<RecipeAllergenEntry, 
         }), RecipeAllergensRepository {
 
     override suspend fun findAllByRecipeId(recipeId: Int): List<RecipeAllergenEntry> = transaction{
-        RecipeAllergens.selectAll()
+        table.selectAll()
             .where { RecipeAllergens.recipeId eq recipeId }
             .map(toEntity)
             .toList()
+    }
+
+    override suspend fun findAllByAllergenId(allergenId: Int): List<RecipeAllergenEntry> = transaction {
+        table.selectAll()
+            .where { RecipeAllergens.allergenId eq allergenId }
+            .map(toEntity)
+        .   toList()
     }
 }

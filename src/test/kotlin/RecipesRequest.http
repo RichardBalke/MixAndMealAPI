@@ -133,4 +133,19 @@ Authorization: Bearer {{token}}
   ]
 }
 
+### search recipes
+POST http://127.0.0.1:8080/recipe/search
+
+{
+    "partialTitle": "bla",
+    "difficulty": "",
+    "mealType": "",
+    "kitchenStyle": "",
+    "maxCookingTime": 0,
+    "diets": [],
+    "allergens": [],
+    "ingredients": []
+}
+
+
 

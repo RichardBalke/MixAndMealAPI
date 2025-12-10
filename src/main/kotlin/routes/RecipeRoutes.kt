@@ -13,6 +13,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import models.dto.IngredientEntry
 import models.dto.RecipeEntry
+import requests.RecipeSearchRequest
 import responses.FullRecipeScreenResponse
 import service.AllergenService
 import service.DietsService
@@ -55,6 +56,23 @@ fun Route.getFullRecipe(
                 ingredients
             )
             call.respond(HttpStatusCode.OK, fullRecipe)
+        }
+    }
+}
+
+fun Route.recipeSearchResults(recipeService: RecipeService){
+    route("recipe/search"){
+        post(){
+            val request = call.receive<RecipeSearchRequest>()
+            val recipes = recipeService.searchRecipes(request)
+
+            if(recipes.isEmpty()){
+                call.respond(HttpStatusCode.NoContent, "No recipes found")
+            }
+            else{
+                call.respond(HttpStatusCode.OK, recipes)
+            }
+
         }
     }
 }

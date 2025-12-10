@@ -1,6 +1,7 @@
 package service
 
 import models.dto.AllergenEntry
+import models.dto.RecipeEntry
 import repository.RecipeAllergensRepositoryImpl
 
 class RecipeAllergenService(val recipeAllergensRepository: RecipeAllergensRepositoryImpl) {
@@ -14,5 +15,17 @@ class RecipeAllergenService(val recipeAllergensRepository: RecipeAllergensReposi
             }
         }
         return allergens
+    }
+
+    suspend fun getRecipesByAllergenId(allergenId : Int, recipeService : RecipeService): List<RecipeEntry> {
+        val recipeAllergenList = recipeAllergensRepository.findAllByAllergenId(allergenId)
+        val recipes = mutableListOf<RecipeEntry>()
+        for(recipeEntry in recipeAllergenList) {
+            val recipe = recipeService.getRecipe(recipeEntry.recipeId)
+            if(recipe != null) {
+                recipes.add(recipe)
+            }
+        }
+        return recipes
     }
 }
