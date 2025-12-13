@@ -18,7 +18,6 @@ create table recipes
     preptime     integer,
     cookingtime  integer,
     difficulty   varchar,
-    image        bytea,
     mealtype     varchar,
     kitchenstyle varchar,
     favoritescount integer
@@ -100,6 +99,13 @@ create table recipe_allergens
     allergen_id integer not null references allergens(allergen_id),
     primary key (recipe_id, allergen_id)
 );
+
+create table recipe_images
+(
+    recipe_image_id integer generated always as identity primary key,
+    recipe_id integer not null references recipes(recipe_id),
+    image_url varchar not null
+)
 
 
 

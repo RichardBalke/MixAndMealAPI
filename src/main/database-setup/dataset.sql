@@ -14,17 +14,17 @@ insert into users (name, email, password, role) values
     ('Richard',     'richard@example.com',   'admin123',   'ADMIN'),
     ('Yoran',     'yoran@example.com',   'admin123',   'ADMIN');
 
-insert into recipes (recipe_id, title, description, instructions, preptime, cookingtime, difficulty, image, mealtype, kitchenstyle, favoritescount) values
-    (1, 'Spaghetti Bolognese', 'Classic Italian pasta with meat sauce.', 'instructions needed', 15, 45, 'medium', NULL, 'dinner', 'Italian', 0),
-    (2, 'Vegetable Stir Fry',  'Quick and healthy mixed vegetable stir fry.', 'instructions needed', 10, 15, 'easy', NULL, 'lunch', 'Asian', 0),
-    (3, 'Chicken Curry',       'Aromatic curry with chicken and basmati rice.', 'instructions needed', 20, 40, 'medium', NULL, 'dinner', 'Indian', 0),
-    (4, 'Avocado Toast',       'Simple toast topped with fresh avocado.', 'instructions needed', 5, 5, 'easy', NULL, 'breakfast', 'American', 0),
-    (5, 'Beef Tacos',          'Seasoned beef with fresh taco toppings.', 'instructions needed', 20, 10, 'easy', NULL, 'dinner', 'Mexican', 0),
-    (6, 'Greek Salad',         'Fresh salad with feta cheese and olives.', 'instructions needed', 10, 0, 'easy', NULL, 'lunch', 'Greek', 0),
-    (7, 'Pancakes',            'Fluffy breakfast pancakes with syrup.', 'instructions needed', 10, 15, 'easy', NULL, 'breakfast', 'American', 0),
-    (8, 'Sushi Rolls',         'Rice rolls with fish and vegetables.', 'instructions needed', 25, 0, 'hard', NULL, 'dinner', 'Japanese', 0),
-    (9, 'Lentil Soup',         'Hearty vegetarian lentil soup.', 'instructions needed', 15, 35, 'easy', NULL, 'dinner', 'Mediterranean', 0),
-    (10,'Salmon Teriyaki',     'Grilled salmon with teriyaki glaze.', 'instructions needed', 15, 20, 'medium', NULL, 'dinner', 'Japanese', 0);
+insert into recipes (recipe_id, title, description, instructions, preptime, cookingtime, difficulty, mealtype, kitchenstyle, favoritescount) values
+    (1, 'Spaghetti Bolognese', 'Classic Italian pasta with meat sauce.', 'instructions needed', 15, 45, 'medium', 'dinner', 'Italian', 0),
+    (2, 'Vegetable Stir Fry',  'Quick and healthy mixed vegetable stir fry.', 'instructions needed', 10, 15, 'easy', 'lunch', 'Asian', 0),
+    (3, 'Chicken Curry',       'Aromatic curry with chicken and basmati rice.', 'instructions needed', 20, 40, 'medium', 'dinner', 'Indian', 0),
+    (4, 'Avocado Toast',       'Simple toast topped with fresh avocado.', 'instructions needed', 5, 5, 'easy', 'breakfast', 'American', 0),
+    (5, 'Beef Tacos',          'Seasoned beef with fresh taco toppings.', 'instructions needed', 20, 10, 'easy', 'dinner', 'Mexican', 0),
+    (6, 'Greek Salad',         'Fresh salad with feta cheese and olives.', 'instructions needed', 10, 0, 'easy', 'lunch', 'Greek', 0),
+    (7, 'Pancakes',            'Fluffy breakfast pancakes with syrup.', 'instructions needed', 10, 15, 'easy', 'breakfast', 'American', 0),
+    (8, 'Sushi Rolls',         'Rice rolls with fish and vegetables.', 'instructions needed', 25, 0, 'hard', 'dinner', 'Japanese', 0),
+    (9, 'Lentil Soup',         'Hearty vegetarian lentil soup.', 'instructions needed', 15, 35, 'easy', 'dinner', 'Mediterranean', 0),
+    (10,'Salmon Teriyaki',     'Grilled salmon with teriyaki glaze.', 'instructions needed', 15, 20, 'medium', 'dinner', 'Japanese', 0);
 
 insert into ingredients (name, description) values
     ('Tomato', 'Fresh red tomatoes.'),
@@ -208,3 +208,15 @@ insert into recipe_allergens (recipe_id, allergen_id) values
     (2, 4),
     (7, 1),
     (5, 1);
+
+insert into recipe_images (recipe_id, image_url) values
+    (1, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (2, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (3, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (4, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (5, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (6, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (7, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (8, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (9, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg'),
+    (10, 'https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg');
