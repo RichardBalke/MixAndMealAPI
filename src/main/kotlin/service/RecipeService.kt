@@ -1,13 +1,15 @@
 package service
 
+import api.repository.RecipesRepository
 import api.repository.RecipesRepositoryImpl
 import models.dto.RecipeEntry
 import models.tables.Recipes
+import org.koin.java.KoinJavaComponent.inject
 import repository.RecipeAllergensRepositoryImpl
 import requests.RecipeSearchRequest
 
-class RecipeService(private val recipeRepository: RecipesRepositoryImpl) {
-
+class RecipeService() {
+    private val recipeRepository : RecipesRepository = RecipesRepositoryImpl()
     fun formatCookingTime(minutes: Int): String {
         val hours = minutes / 60
         val minutes = minutes % 60
@@ -59,7 +61,7 @@ class RecipeService(private val recipeRepository: RecipesRepositoryImpl) {
     }
 
     suspend fun getRecipe(id: Int): RecipeEntry? {
-        return recipeRepository.findById(id)
+        return recipeRepository.findByRecipeId(id)
     }
 
     suspend fun deleteRecipe(id: Int) : Boolean {

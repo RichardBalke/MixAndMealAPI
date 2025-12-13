@@ -17,6 +17,7 @@ interface RecipesRepository : CrudRepository<RecipeEntry, Int>{
     suspend fun findByMealType(mealType: String): List<RecipeEntry>
     suspend fun findByDiets(diets: String): List<RecipeEntry>
     suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry>
+    suspend fun findByRecipeId(recipeId: Int): RecipeEntry?
 
 //    suspend fun updateImage(recipeID: Long, imageUrl: String): Boolean
 //    suspend fun findByFavourites(favourites : Favourites): List<Recipes>
@@ -94,6 +95,13 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
             .where(Recipes.kitchenStyle eq kitchenStyle)
             .mapNotNull(toEntity)
             .toList()
+    }
+
+    override suspend fun findByRecipeId(recipeId: Int): RecipeEntry? = transaction {
+        table.selectAll()
+            .where { Recipes.id eq recipeId }
+            .mapNotNull(toEntity)
+            .firstOrNull()
     }
 
 }

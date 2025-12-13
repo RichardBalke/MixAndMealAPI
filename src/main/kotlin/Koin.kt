@@ -58,8 +58,8 @@ fun Application.configureKoin(){
         factory { RecipeAllergenService(get()) }
         single<RecipeDietsRepository> { RecipeDietsRepositoryImpl() }
         factory { RecipeDietsService(get()) }
-        single<RecipesRepository> { RecipesRepositoryImpl() }
-        factory { RecipeService(get()) }
+//        single<RecipesRepository> { RecipesRepositoryImpl() }
+//        factory { RecipeService(get()) }
         single<UserAllergensRepository> { UserAllergensRepositoryImpl() }
         factory { UserAllergensService(get()) }
         single<UserDietsRepository> { UserDietsRepositoryImpl() }

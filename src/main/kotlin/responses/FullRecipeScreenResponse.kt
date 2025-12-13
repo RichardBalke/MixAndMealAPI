@@ -17,7 +17,7 @@ data class FullRecipeScreenResponse(
     val prepTime: Int,
     val cookingTime: Int,
     val difficulty: Difficulty,
-    val image: ByteArray?,
+    val image: List<String>,
     val mealType: MealType,
     val kitchenStyle: KitchenStyle,
     val diets: List<DietEntry>,

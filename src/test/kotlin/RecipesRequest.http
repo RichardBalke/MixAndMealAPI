@@ -147,5 +147,8 @@ POST http://127.0.0.1:8080/recipe/search
     "ingredients": []
 }
 
+###
+GET http://127.0.0.1:8080/recipes/featured/1
+
 
 

@@ -23,7 +23,7 @@ fun Route.userRoutes() {
             get {
                 // Deze if else statement check of de ingelogde user een admin rol heeft
                 if (call.requireAdmin()) {
-                    val users = userService.
+                    val users = userService.getAll()
                     call.respond(users)
                 } else {
                     call.respond(HttpStatusCode.Unauthorized)
@@ -37,12 +37,12 @@ fun Route.userRoutes() {
                     ?: return@get call.respond(HttpStatusCode.BadRequest)
 
                 if (id == call.authenticatedUserId()) {
-                    val user = userRepo.findById(id)
+                    val user = userService.getByEmail(id)
                         ?: return@get call.respond(HttpStatusCode.NotFound)
 
                     call.respond(HttpStatusCode.OK, user)
                 } else if (call.requireAdmin()) {
-                    val user = userRepo.findById(id)
+                    val user = userService.getByEmail(id)
                         ?: return@get call.respond(HttpStatusCode.NotFound)
 
                     call.respond(HttpStatusCode.OK, user)

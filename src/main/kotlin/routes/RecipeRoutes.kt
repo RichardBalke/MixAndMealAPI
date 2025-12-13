@@ -2,6 +2,7 @@ package api.routes
 
 import api.repository.IngredientUnitRepositoryImpl
 import api.repository.RecipesRepositoryImpl
+import api.responses.RecipeCardResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
@@ -11,8 +12,10 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import jdk.internal.vm.ScopedValueContainer.call
 import models.dto.IngredientEntry
 import models.dto.RecipeEntry
+import org.koin.ktor.ext.inject
 import requests.RecipeSearchRequest
 import responses.FullRecipeScreenResponse
 import service.AllergenService
@@ -36,9 +39,9 @@ fun Route.getFullRecipe(
             val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
 
             val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Recipe not found")
-            val diets = recipeDietService.getDietsbyRecipeId(id, dietsService) ?: return@get call.respond(HttpStatusCode.NotFound, "Diets not found")
-            val allergens = recipeAllergenService.getAllergensByRecipeId(id, allergenService) ?: return@get call.respond(HttpStatusCode.NotFound, "Allergens not found")
-            val ingredients = ingredientUnitService.getIngredientsByRecipeId(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Ingredients not found")
+            val diets = recipeDietService.getDietsbyRecipeId(id, dietsService)
+            val allergens = recipeAllergenService.getAllergensByRecipeId(id, allergenService)
+            val ingredients = ingredientUnitService.getIngredientsByRecipeId(id)
 
             val fullRecipe = FullRecipeScreenResponse(
                 recipe.id,
@@ -48,7 +51,7 @@ fun Route.getFullRecipe(
                 recipe.prepTime,
                 recipe.cookingTime,
                 recipe.difficulty,
-                recipe.image,
+                listOf("https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg"),
                 recipe.mealType,
                 recipe.kitchenStyle,
                 diets,
@@ -60,19 +63,38 @@ fun Route.getFullRecipe(
     }
 }
 
-fun Route.recipeSearchResults(recipeService: RecipeService){
-    route("recipe/search"){
-        post(){
-            val request = call.receive<RecipeSearchRequest>()
-            val recipes = recipeService.searchRecipes(request)
+//fun Route.recipeSearchResults(recipeService: RecipeService){
+//    route("recipe/search"){
+//        post(){
+//            val request = call.receive<RecipeSearchRequest>()
+//            val recipes = recipeService.searchRecipes(request)
+//
+//            if(recipes.isEmpty()){
+//                call.respond(HttpStatusCode.NoContent, "No recipes found")
+//            }
+//            else{
+//                call.respond(HttpStatusCode.OK, recipes)
+//            }
+//
+//        }
+//    }
+//}
 
-            if(recipes.isEmpty()){
-                call.respond(HttpStatusCode.NoContent, "No recipes found")
-            }
-            else{
-                call.respond(HttpStatusCode.OK, recipes)
-            }
+fun Route.featuredRecipeDetails(){
+    route("/recipes/featured"){
+        get("/{recipeId}") {
+            val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val recipeService = RecipeService()
+            val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Recipe not found")
 
+            val response : RecipeCardResponse = RecipeCardResponse(
+                recipe.id,
+                recipe.title,
+                recipe.description,
+                recipe.cookingTime,
+                listOf("https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg")
+            )
+            call.respond(HttpStatusCode.OK, response)
         }
     }
 }
@@ -86,7 +108,7 @@ fun Route.recipesRoutes(recipeService: RecipeService) {
             val recipeRepo = RecipesRepositoryImpl()
             call.respond(recipeRepo.findAll())
         }
-//        authenticate {
+
             post {
                 if(call.requireAdmin()){
                     val request = call.receive<RecipeEntry>()
@@ -110,83 +132,6 @@ fun Route.recipesRoutes(recipeService: RecipeService) {
                 call.respond(title)
             }
         }
-
-        //Get by mealtype
-//        get("/mealtype/{mealtype}") {
-//            val type = call.parameters["mealtype"]?.lowercase()
-//
-//            if (type == null) {
-//                call.respond(HttpStatusCode.BadRequest)
-//            }
-//
-//            val recipes = recipeRepo.findByMealType(type)
-//
-//            if (recipes.isEmpty()) {
-//                call.respond(HttpStatusCode.NotFound, "No recipes found for meal type $type.")
-//            } else {
-//                call.respond(recipes)
-//            }
-//        }
-
-        //Get by difficulty
-//        get("/difficulty/{difficulty}") {
-//            val diff = call.parameters["difficulty"]?.lowercase()
-//
-//            if (diff == null) {
-//                call.respond(HttpStatusCode.BadRequest)
-//            }
-//
-//            val difficulty = recipeRepo.findByDifficulty(diff)
-//
-//            if (difficulty.isEmpty()) {
-//                call.respond(HttpStatusCode.BadRequest, "Invalid difficulty level '$difficulty'.")
-//            } else {
-//                call.respond(difficulty)
-//            }
-//        }
-
-        //Get by diets
-//        get("/diets/{diet}") {
-//            fun String?.isValidDietDisplayName(): Boolean {
-//                if (this == null) return false
-//                return Diet.entries.any { it.displayName.lowercase() == this.lowercase() }
-//            }
-//
-//            val diets = call.parameters["diet"]?.lowercase()
-//
-//            if (diets == null || !diets.isValidDietDisplayName()) {
-//                call.respond(HttpStatusCode.BadRequest, "Invalid diet choice '$diets")
-//                return@get
-//            }
-//
-//            val dietsChoice = recipeRepo.findByDiets(diets)
-//
-//            if (dietsChoice.isEmpty()) {
-//                call.respond(HttpStatusCode.BadRequest, "Invalid diet choice '$diets'")
-//            } else {
-//                call.respond(dietsChoice)
-//            }
-//        }
-
-//        Get by kitchen style
-//        get("/kitchen/{style}") {
-//            val style = call.parameters["style"]?.lowercase()
-//
-//            if (style == null) {
-//                call.respond(HttpStatusCode.BadRequest, "Missing kitchen style.")
-//                return@get
-//            }
-//
-//            val recipes = recipeRepo.findByKitchenStyle(style)
-//
-//            if (recipes.isEmpty()) {
-//                call.respond(HttpStatusCode.NotFound, "No recipes found for kitchen style '$style'.")
-//            } else {
-//                call.respond(recipes)
-//            }
-//
-//
-//        }
 
         get("/{id}") {
             // controleert of de parameter {id} in de url naar een Long type geconvert kan worden.
@@ -219,36 +164,6 @@ fun Route.recipesRoutes(recipeService: RecipeService) {
                 }
             }
 
-//            put("/{id}") {
-//                if(call.requireAdmin()){
-//                    val id = call.parameters["id"]?.toLongOrNull()
-//                        ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid ID format")
-//
-//                    val request = try {
-//                        call.receive<Recipes>()
-//                    } catch (e: Exception) {
-//                        return@put call.respond(
-//                            HttpStatusCode.BadRequest,
-//                            "Invalid request body: ${e.message ?: "malformed JSON"}"
-//                        )
-//                    }
-//
-//                    val updatedRecipe = request.copy(id = id)
-//
-//                    try {
-//                        FakeRecipeRepository.update(updatedRecipe)
-//                        call.respond(HttpStatusCode.OK, updatedRecipe)
-//                    } catch (e: IllegalArgumentException) {
-//                        call.respond(HttpStatusCode.NotFound, e.message ?: "Recipe not found")
-//                    } catch (e: Exception) {
-//                        call.respond(HttpStatusCode.InternalServerError, "Update failed: ${e.message}")
-//                    }
-//                } else {
-//                    call.respond(HttpStatusCode.Unauthorized)
-//                }
-//
-//            }
-
         }
         post("/ingredient"){
             val ingredient = call.receive<IngredientEntry>()
@@ -262,6 +177,5 @@ fun Route.recipesRoutes(recipeService: RecipeService) {
                 call.respond(HttpStatusCode.NotFound)
             }
 
-//        }
     }
 }
