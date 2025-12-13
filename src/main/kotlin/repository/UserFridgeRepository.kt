@@ -2,12 +2,13 @@ package repository
 
 import models.dto.UserFridgeEntry
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.tables.UserFridge
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-interface UserFridgeRepository {
+interface UserFridgeRepository : CrudRepository<UserFridgeEntry, UserFridgeEntry> {
     suspend fun getFridgeForUser(userId: String): List<UserFridgeEntry>
     suspend fun addIngredient(userId: String, ingredientName: String): UserFridgeEntry
     suspend fun removeIngredient(userId: String, ingredientName: String)

@@ -14,6 +14,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import models.dto.TokenConfig
+import org.koin.ktor.ext.inject
 import repository.AllergensRepositoryImpl
 import repository.DietsRepositoryImpl
 import repository.RecipeAllergensRepositoryImpl
@@ -45,7 +46,9 @@ fun Application.configureRouting(
         val dietsService = DietsService(DietsRepositoryImpl())
         val allergenService = AllergenService(AllergensRepositoryImpl())
         val ingredientUnitService = IngredientUnitService(IngredientUnitRepositoryImpl())
-        val userService = UserService(UserRepositoryImpl())
+
+        // this is an example of the use of Koin dependency injection
+        val userService by inject<UserService>()
 
         userRoutes()
         ingredientsRoutes()

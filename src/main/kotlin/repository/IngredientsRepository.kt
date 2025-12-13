@@ -5,7 +5,7 @@ import models.tables.Ingredients
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-interface IngredientsRepository {
+interface IngredientsRepository : CrudRepository<IngredientEntry, String> {
     suspend fun findByName(name: String): IngredientEntry?
     suspend fun updateAllergens(ingredientName : String, newAllergens : List<Int>) : IngredientEntry
 }

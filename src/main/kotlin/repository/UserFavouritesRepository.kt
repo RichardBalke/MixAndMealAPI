@@ -2,11 +2,12 @@ package repository
 
 import models.dto.UserFavouritesEntry
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.tables.UserFavourites
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
-interface UserFavouritesRepository {
+interface UserFavouritesRepository : CrudRepository<UserFavouritesEntry, UserFavouritesEntry> {
     suspend fun getFavouritesForUser(userId: String): List<UserFavouritesEntry>
     suspend fun addFavourite(userId: String, recipeId: Int): UserFavouritesEntry
     suspend fun removeFavourite(userId: String, recipeId: Int)

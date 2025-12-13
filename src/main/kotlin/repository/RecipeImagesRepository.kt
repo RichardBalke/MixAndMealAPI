@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 
 
-interface RecipeImageRepository {
+interface RecipeImageRepository : CrudRepository<RecipeImageEntry, Int>  {
     suspend fun getImagesForRecipe(recipeId: Int): List<RecipeImageEntry>
     suspend fun addImage(recipeId: Int, imageUrl: String): RecipeImageEntry
     suspend fun deleteImage(imageId: Int)
@@ -18,7 +18,7 @@ interface RecipeImageRepository {
 
 class RecipeImagesRepositoryImpl :
     RecipeImageRepository,
-    CrudImplementation<RecipeImageEntry, RecipeImageEntry>(
+    CrudImplementation<RecipeImageEntry, Int>(
         table = RecipeImages,
         toEntity = { row ->
             RecipeImageEntry(
@@ -28,7 +28,7 @@ class RecipeImagesRepositoryImpl :
             )
         },
         idColumns = listOf(RecipeImages.id),
-        idExtractor = { entry -> listOf(entry.id) },
+        idExtractor = { entry -> listOf(entry) },
         entityMapper = { stmt, entry ->
             stmt[RecipeImages.recipeId] = entry.recipeId
             stmt[RecipeImages.imageUrl] = entry.imageUrl
@@ -47,6 +47,6 @@ class RecipeImagesRepositoryImpl :
     }
 
     override suspend fun deleteImage(imageId: Int) {
-        delete(RecipeImageEntry(id = imageId, recipeId = 0, imageUrl = ""))
+        delete(imageId)
     }
 }

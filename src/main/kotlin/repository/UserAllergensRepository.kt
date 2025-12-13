@@ -2,11 +2,12 @@ package repository
 
 import models.dto.UserAllergenEntry
 import api.repository.CrudImplementation
+import api.repository.CrudRepository
 import models.tables.UserAllergens
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
-interface UserAllergensRepository {
+interface UserAllergensRepository : CrudRepository<UserAllergenEntry, UserAllergenEntry> {
     suspend fun getAllergensForUser(userId: String): List<UserAllergenEntry>
     suspend fun addAllergen(userId: String, allergenId: Int): UserAllergenEntry
     suspend fun removeAllergen(userId: String, allergenId: Int)

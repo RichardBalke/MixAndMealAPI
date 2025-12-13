@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 
-interface UserRepository {
+interface UserRepository : CrudRepository<UserEntry, String> {
     suspend fun findByUsername(username: String): UserEntry?
     suspend fun findByEmail(email: String): UserEntry?
     suspend fun getRoleById(id: String): Role

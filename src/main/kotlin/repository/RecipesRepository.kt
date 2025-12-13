@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-interface RecipesRepository {
+interface RecipesRepository : CrudRepository<RecipeEntry, Int>{
     suspend fun findByTitle(title: String): List<RecipeEntry>
     suspend fun findByDifficulty(difficulty: String): List<RecipeEntry>
     suspend fun findByMealType(mealType: String): List<RecipeEntry>
@@ -39,7 +39,6 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
             row[Recipes.prepTime],
             row[Recipes.cookingTime],
             difficultyEnum,
-            row[Recipes.image] as? ByteArray,
             mealTypeEnum,
             kitchenStyleEnum,
             row[Recipes.favoritesCount]) },
@@ -53,7 +52,6 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
         stmt[Recipes.prepTime] = recipe.prepTime
         stmt[Recipes.cookingTime] = recipe.cookingTime
         stmt[Recipes.difficulty] = recipe.difficulty.name
-        stmt[Recipes.image] = recipe.image
         stmt[Recipes.mealType] = recipe.mealType.name
         stmt[Recipes.kitchenStyle] = recipe.kitchenStyle.name
         stmt[Recipes.favoritesCount] = recipe.favoritesCount

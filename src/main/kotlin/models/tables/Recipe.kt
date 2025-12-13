@@ -10,7 +10,6 @@ object Recipes : Table() {
     val prepTime = integer("preptime")
     val cookingTime = integer("cookingtime")
     val difficulty = varchar("difficulty", 255)
-    val image = binary("image", 1024*1024).nullable()
     val mealType = varchar("mealtype", 255)
     val kitchenStyle = varchar("kitchenstyle", 255)
     val favoritesCount = integer("favoritescount")

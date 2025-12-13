@@ -14,7 +14,6 @@ data class RecipeEntry(
     val prepTime: Int,
     val cookingTime: Int,
     val difficulty: Difficulty,
-    val image: ByteArray?,
     val mealType: MealType,
     val kitchenStyle: KitchenStyle,
     val favoritesCount: Int

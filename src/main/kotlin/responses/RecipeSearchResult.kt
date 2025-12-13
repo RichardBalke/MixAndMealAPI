@@ -8,6 +8,6 @@ data class RecipeSearchResult(
     val title: String,
     val description: String,
     val cookingTime: Int,
-    val imageUrl: ByteArray?,
+    val imageUrl: List<String>,
     val score: Double
 )

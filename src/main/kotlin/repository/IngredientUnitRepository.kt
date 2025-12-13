@@ -47,7 +47,7 @@ class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
                             row[Recipes.title],
                             row[Recipes.description],
                             row[Recipes.cookingTime],
-                            row[Recipes.image],
+                            listOf("placeholder for images"),
                             0.0
                         )
                     }

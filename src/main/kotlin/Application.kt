@@ -4,7 +4,11 @@ import api.repository.UserRepositoryImpl
 import io.ktor.server.application.*
 import models.dto.TokenConfig
 import org.jetbrains.exposed.sql.Database
+import org.koin.dsl.module
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 import service.JwtService
+import service.UserService
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -13,6 +17,7 @@ fun main(args: Array<String>) {
 
 
 fun Application.module() {
+    configureKoin()
     initDatabase()
     val tokenService = JwtService()
     val tokenConfig = TokenConfig(

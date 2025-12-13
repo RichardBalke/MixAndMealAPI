@@ -7,12 +7,15 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
+import service.UserService
 import service.authenticatedUserId
 import service.requireAdmin
+import kotlin.getValue
 
 
 fun Route.userRoutes() {
-    val userRepo = UserRepositoryImpl()
+    val userService by inject<UserService>()
     // authenticate zorgt ervoor dat alleen ingelogde users de routes kunnen gebruiken.
     authenticate {
         route("/users") {
@@ -20,7 +23,7 @@ fun Route.userRoutes() {
             get {
                 // Deze if else statement check of de ingelogde user een admin rol heeft
                 if (call.requireAdmin()) {
-                    val users = userRepo.findAll()
+                    val users = userService.
                     call.respond(users)
                 } else {
                     call.respond(HttpStatusCode.Unauthorized)
