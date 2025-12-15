@@ -13,12 +13,15 @@ import io.ktor.server.routing.post
 import models.dto.TokenClaim
 import models.dto.TokenConfig
 import models.dto.UserEntry
+import org.koin.ktor.ext.inject
 import requests.AuthRequest
 import requests.Login
 import responses.AuthResponse
 import service.JwtService
+import service.RecipeService
 import service.UserService
 import service.requireAdmin
+import kotlin.getValue
 
 
 fun Route.signUp(){
@@ -55,10 +58,9 @@ fun Route.signUp(){
 
 fun Route.signIn(
     tokenService: JwtService,
-    tokenConfig : TokenConfig,
-    userService : UserService
+    tokenConfig : TokenConfig
 ){
-//    val userRepo = UserRepositoryImpl()
+    val userService by inject<UserService>()
     post("/signin"){
         val request = call.receiveNullable<Login>()
         if(request == null){

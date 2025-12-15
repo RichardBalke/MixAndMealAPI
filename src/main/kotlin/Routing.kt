@@ -1,6 +1,7 @@
 package api
 
 import api.repository.IngredientUnitRepositoryImpl
+import api.repository.RecipesRepositoryImpl
 import api.routes.featuredRecipeDetails
 import api.routes.getFullRecipe
 import api.routes.ingredientsRoutes
@@ -36,25 +37,14 @@ fun Application.configureRouting(
     tokenConfig: TokenConfig
     ) {
     routing {
-        val recipeService = RecipeService()
-        val userFridgeService = UserFridgeService(UserFridgeRepositoryImpl())
-        val recipeDietsService = RecipeDietsService(RecipeDietsRepositoryImpl())
-        val recipeAllergenService = RecipeAllergenService(RecipeAllergensRepositoryImpl())
-        val dietsService = DietsService(DietsRepositoryImpl())
-        val allergenService = AllergenService(AllergensRepositoryImpl())
-        val ingredientUnitService = IngredientUnitService(IngredientUnitRepositoryImpl())
-
-        // this is an example of the use of Koin dependency injection
-        val userService by inject<UserService>()
-
         featuredRecipeDetails()
         userRoutes()
         ingredientsRoutes()
-        recipesRoutes(recipeService)
-        getFullRecipe(recipeService,recipeDietsService, dietsService, recipeAllergenService, allergenService, ingredientUnitService)
+        recipesRoutes()
+        getFullRecipe()
         userFridgeRoutes(UserFridgeService(UserFridgeRepositoryImpl()))
         signUp()
-        signIn(tokenService, tokenConfig, userService)
+        signIn(tokenService, tokenConfig)
         authenticated()
         getSecretInfo()
         get("/") {

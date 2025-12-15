@@ -8,6 +8,8 @@ import api.repository.UserRepository
 import api.repository.UserRepositoryImpl
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -46,29 +48,29 @@ fun Application.configureKoin(){
     // create all dependencies that can be injected.
     // You can use 'single' for singletons and 'factory' for multiple instances
     val appModule = module {
-        single<UserRepository> { UserRepositoryImpl() }
+        singleOf(::UserRepositoryImpl) bind UserRepository::class
         factory { UserService(get()) }
-        single<AllergensRepository> { AllergensRepositoryImpl() }
+        singleOf(::AllergensRepositoryImpl) bind AllergensRepository::class
         factory { AllergenService(get()) }
-        single<DietsRepository> { DietsRepositoryImpl() }
+        singleOf(::DietsRepositoryImpl) bind DietsRepository::class
         factory { DietsService(get()) }
-        single<IngredientUnitRepository> { IngredientUnitRepositoryImpl() }
+        singleOf(::IngredientUnitRepositoryImpl) bind IngredientUnitRepository::class
         factory { IngredientUnitService(get()) }
-        single<RecipeAllergensRepository> { RecipeAllergensRepositoryImpl() }
+        singleOf(::RecipeAllergensRepositoryImpl) bind RecipeAllergensRepository::class
         factory { RecipeAllergenService(get()) }
-        single<RecipeDietsRepository> { RecipeDietsRepositoryImpl() }
+        singleOf(::RecipeDietsRepositoryImpl) bind RecipeDietsRepository::class
         factory { RecipeDietsService(get()) }
-//        single<RecipesRepository> { RecipesRepositoryImpl() }
-//        factory { RecipeService(get()) }
-        single<UserAllergensRepository> { UserAllergensRepositoryImpl() }
+        singleOf(::RecipesRepositoryImpl) bind RecipesRepository::class
+        factory { RecipeService(get()) }
+        singleOf(::UserAllergensRepositoryImpl) bind UserAllergensRepository::class
         factory { UserAllergensService(get()) }
-        single<UserDietsRepository> { UserDietsRepositoryImpl() }
+        singleOf(::UserDietsRepositoryImpl) bind UserDietsRepository::class
         factory { UserDietsService(get()) }
-        single<UserFavouritesRepository> { UserFavouritesRepositoryImpl() }
+        singleOf(::UserFavouritesRepositoryImpl) bind UserFavouritesRepository::class
         factory { UserFavouritesService(get()) }
-        single<UserFridgeRepository> { UserFridgeRepositoryImpl() }
+        singleOf(::UserFridgeRepositoryImpl) bind UserFridgeRepository::class
         factory { UserFridgeService(get()) }
-        single<RecipeImageRepository> { RecipeImagesRepositoryImpl() }
+        singleOf(::RecipeImagesRepositoryImpl) bind RecipeImageRepository::class
         factory { RecipeImagesService(get()) }
     }
 

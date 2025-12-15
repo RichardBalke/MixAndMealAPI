@@ -26,15 +26,14 @@ import service.RecipeDietsService
 import service.RecipeService
 import service.requireAdmin
 
-fun Route.getFullRecipe(
-    recipeService: RecipeService,
-    recipeDietService : RecipeDietsService,
-    dietsService: DietsService,
-    recipeAllergenService : RecipeAllergenService,
-    allergenService: AllergenService,
-    ingredientUnitService: IngredientUnitService
-) {
+fun Route.getFullRecipe() {
     route("/fullrecipe") {
+        val recipeService by inject<RecipeService>()
+        val recipeDietService by inject<RecipeDietsService>()
+        val dietsService by inject<DietsService>()
+        val recipeAllergenService by inject<RecipeAllergenService>()
+        val allergenService by inject<AllergenService>()
+        val ingredientUnitService by inject<IngredientUnitService>()
         get("/{recipeId}"){
             val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
 
@@ -84,7 +83,7 @@ fun Route.featuredRecipeDetails(){
     route("/recipes/featured"){
         get("/{recipeId}") {
             val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
-            val recipeService = RecipeService()
+            val recipeService by inject<RecipeService>()
             val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Recipe not found")
 
             val response : RecipeCardResponse = RecipeCardResponse(
@@ -99,8 +98,8 @@ fun Route.featuredRecipeDetails(){
     }
 }
 
-fun Route.recipesRoutes(recipeService: RecipeService) {
-
+fun Route.recipesRoutes() {
+    val recipeService by inject<RecipeService>()
     route("/recipes") {
 
         // Get all recipes

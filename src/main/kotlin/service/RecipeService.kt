@@ -8,8 +8,7 @@ import org.koin.java.KoinJavaComponent.inject
 import repository.RecipeAllergensRepositoryImpl
 import requests.RecipeSearchRequest
 
-class RecipeService() {
-    private val recipeRepository : RecipesRepository = RecipesRepositoryImpl()
+class RecipeService(private val recipeRepository : RecipesRepository) {
     fun formatCookingTime(minutes: Int): String {
         val hours = minutes / 60
         val minutes = minutes % 60
