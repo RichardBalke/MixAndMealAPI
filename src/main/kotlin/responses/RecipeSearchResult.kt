@@ -1,6 +1,7 @@
 package responses
 
 import kotlinx.serialization.Serializable
+import models.dto.RecipeImageEntry
 
 @Serializable
 data class RecipeSearchResult(
@@ -8,6 +9,6 @@ data class RecipeSearchResult(
     val title: String,
     val description: String,
     val cookingTime: Int,
-    val imageUrl: List<String>,
+    val imageUrl: List<RecipeImageEntry>,
     val score: Double
 )

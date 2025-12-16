@@ -23,12 +23,14 @@ import service.DietsService
 import service.IngredientUnitService
 import service.RecipeAllergenService
 import service.RecipeDietsService
+import service.RecipeImagesService
 import service.RecipeService
 import service.requireAdmin
 
-fun Route.getFullRecipe() {
+fun Route.fullRecipe() {
     route("/fullrecipe") {
         val recipeService by inject<RecipeService>()
+        val recipeImagesService by inject<RecipeImagesService>()
         val recipeDietService by inject<RecipeDietsService>()
         val dietsService by inject<DietsService>()
         val recipeAllergenService by inject<RecipeAllergenService>()
@@ -38,6 +40,7 @@ fun Route.getFullRecipe() {
             val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
 
             val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Recipe not found")
+            val recipeImages = recipeImagesService.getImagesForRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Image not found")
             val diets = recipeDietService.getDietsbyRecipeId(id, dietsService)
             val allergens = recipeAllergenService.getAllergensByRecipeId(id, allergenService)
             val ingredients = ingredientUnitService.getIngredientsByRecipeId(id)
@@ -50,7 +53,7 @@ fun Route.getFullRecipe() {
                 recipe.prepTime,
                 recipe.cookingTime,
                 recipe.difficulty,
-                listOf("https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg"),
+                recipeImages,
                 recipe.mealType,
                 recipe.kitchenStyle,
                 diets,

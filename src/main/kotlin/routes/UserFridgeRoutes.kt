@@ -9,8 +9,10 @@ import models.dto.UserFridgeEntry
 import io.ktor.server.routing.Route
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
+import org.koin.ktor.ext.inject
 
-fun Route.userFridgeRoutes(userFridgeService: UserFridgeService) {
+fun Route.userFridgeRoutes() {
+    val userFridgeService by inject<UserFridgeService>()
 //    authenticate {
         route("/fridge") {
 

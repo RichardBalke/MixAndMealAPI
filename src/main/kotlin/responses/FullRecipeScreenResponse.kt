@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import models.dto.AllergenEntry
 import models.dto.DietEntry
 import models.dto.IngredientUnitEntry
+import models.dto.RecipeImageEntry
 import models.enums.Difficulty
 import models.enums.KitchenStyle
 import models.enums.MealType
@@ -17,7 +18,7 @@ data class FullRecipeScreenResponse(
     val prepTime: Int,
     val cookingTime: Int,
     val difficulty: Difficulty,
-    val image: List<String>,
+    val images: List<RecipeImageEntry>,
     val mealType: MealType,
     val kitchenStyle: KitchenStyle,
     val diets: List<DietEntry>,
