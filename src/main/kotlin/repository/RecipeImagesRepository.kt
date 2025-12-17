@@ -37,8 +37,9 @@ class RecipeImagesRepositoryImpl :
     override suspend fun getImagesForRecipe(recipeId: Int): List<RecipeImageEntry> = transaction {
         RecipeImages
             .selectAll()
-            .where(RecipeImages.id eq recipeId)
+            .where(RecipeImages.recipeId eq recipeId)
             .map(toEntity)
+            .toList()
     }
 
     override suspend fun addImage(recipeId: Int, imageUrl: String): RecipeImageEntry {

@@ -11,6 +11,7 @@ import io.ktor.server.application.install
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.ktor.ext.get
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 import repository.AllergensRepository
@@ -34,6 +35,7 @@ import repository.UserFridgeRepositoryImpl
 import service.AllergenService
 import service.DietsService
 import service.IngredientUnitService
+import service.JwtService
 import service.RecipeAllergenService
 import service.RecipeDietsService
 import service.RecipeImagesService

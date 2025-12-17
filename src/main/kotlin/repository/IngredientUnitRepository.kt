@@ -1,6 +1,7 @@
 package api.repository
 
 import models.dto.IngredientUnitEntry
+import models.dto.RecipeImageEntry
 import models.tables.IngredientUnits
 import models.tables.Recipes
 import org.jetbrains.exposed.sql.selectAll
@@ -47,7 +48,7 @@ class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
                             row[Recipes.title],
                             row[Recipes.description],
                             row[Recipes.cookingTime],
-                            listOf("placeholder for images"),
+                            listOf<RecipeImageEntry>(),
                             0.0
                         )
                     }
