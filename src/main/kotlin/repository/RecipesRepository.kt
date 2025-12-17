@@ -1,12 +1,17 @@
 package api.repository
 
+import api.responses.RecipeCardResponse
 import models.enums.Difficulty
 import models.enums.KitchenStyle
 import models.enums.MealType
 import models.dto.RecipeEntry
+import models.dto.RecipeImageEntry
 import models.tables.Recipes
 import models.tables.RecipeDiets
 import models.tables.Diets
+import models.tables.RecipeImages
+import org.h2.api.H2Type.row
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,6 +23,7 @@ interface RecipesRepository : CrudRepository<RecipeEntry, Int>{
     suspend fun findByDiets(diets: String): List<RecipeEntry>
     suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry>
     suspend fun findByRecipeId(recipeId: Int): RecipeEntry?
+    suspend fun findPopularRecipes(limit: Int): List<RecipeCardResponse>
 
 //    suspend fun updateImage(recipeID: Long, imageUrl: String): Boolean
 //    suspend fun findByFavourites(favourites : Favourites): List<Recipes>
@@ -102,6 +108,21 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
             .where { Recipes.id eq recipeId }
             .mapNotNull(toEntity)
             .firstOrNull()
+    }
+
+    override suspend fun findPopularRecipes(limit: Int): List<RecipeCardResponse> = transaction {
+        table.select(Recipes.id, Recipes.title, Recipes.description, Recipes.cookingTime, Recipes.favoritesCount)
+            .orderBy(Recipes.favoritesCount, SortOrder.DESC)
+            .limit(limit)
+            .map {RecipeCardResponse(
+                recipeId = it[Recipes.id],
+                it[Recipes.title],
+                it[Recipes.description],
+                it[Recipes.cookingTime],
+                mutableListOf()
+            )
+            }
+            .toList()
     }
 
 }

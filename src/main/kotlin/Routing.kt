@@ -3,6 +3,7 @@ package api
 import api.routes.featuredRecipeDetails
 import api.routes.fullRecipe
 import api.routes.ingredientsRoutes
+import api.routes.popularRecipes
 import api.routes.userRoutes
 import api.routes.recipesRoutes
 import api.routes.userFridgeRoutes
@@ -26,6 +27,7 @@ fun Application.configureRouting(
         ingredientsRoutes()
         recipesRoutes()
         fullRecipe()
+        popularRecipes()
         userFridgeRoutes()
         signUp()
         signIn(tokenService, tokenConfig)

@@ -2,6 +2,7 @@ package service
 
 import api.repository.RecipesRepository
 import api.repository.RecipesRepositoryImpl
+import api.responses.RecipeCardResponse
 import models.dto.RecipeEntry
 import models.tables.Recipes
 import org.koin.java.KoinJavaComponent.inject
@@ -82,4 +83,13 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
     suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry>{
         return recipeRepository.findByKitchenStyle(kitchenStyle)
     }
+
+    suspend fun findPopularRecipes(limit: Int, recipeImagesService: RecipeImagesService): List<RecipeCardResponse> {
+        val recipes = recipeRepository.findPopularRecipes(limit)
+        for(recipe in recipes){
+            recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
+        }
+        return recipes
+    }
+
 }

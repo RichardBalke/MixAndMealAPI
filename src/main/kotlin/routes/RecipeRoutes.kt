@@ -87,15 +87,30 @@ fun Route.featuredRecipeDetails(){
         get("/{recipeId}") {
             val id = call.parameters["recipeId"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
             val recipeService by inject<RecipeService>()
+            val recipeImagesService by inject<RecipeImagesService>()
             val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Recipe not found")
-
+            val recipeImages = recipeImagesService.getImagesForRecipe(id).toMutableList()
             val response : RecipeCardResponse = RecipeCardResponse(
                 recipe.id,
                 recipe.title,
                 recipe.description,
                 recipe.cookingTime,
-                listOf("https://dumpvanplaatjes.nl/mix-and-meal/default-image.jpg")
+                recipeImages
             )
+            call.respond(HttpStatusCode.OK, response)
+        }
+    }
+}
+
+fun Route.popularRecipes(){
+    val recipeService by inject<RecipeService>()
+    val recipeImagesService by inject<RecipeImagesService>()
+    route("/popular-recipes"){
+        get(){
+            val response = recipeService.findPopularRecipes(2, recipeImagesService)
+            if(response.isEmpty()){
+                call.respond(HttpStatusCode.NoContent, "Recipes not found")
+            }
             call.respond(HttpStatusCode.OK, response)
         }
     }
