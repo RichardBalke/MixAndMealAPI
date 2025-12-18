@@ -106,8 +106,39 @@ fun Route.popularRecipes(){
     val recipeService by inject<RecipeService>()
     val recipeImagesService by inject<RecipeImagesService>()
     route("/popular-recipes"){
-        get(){
-            val response = recipeService.findPopularRecipes(2, recipeImagesService)
+        get("/{limit}"){
+            val limit = call.parameters["limit"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val response = recipeService.findPopularRecipes(limit, recipeImagesService)
+            if(response.isEmpty()){
+                call.respond(HttpStatusCode.NoContent, "Recipes not found")
+            }
+            call.respond(HttpStatusCode.OK, response)
+        }
+    }
+}
+
+fun Route.recipeCardsByDifficulty(){
+    val recipeService by inject<RecipeService>()
+    val recipeImagesService by inject<RecipeImagesService>()
+    route("/recipes"){
+        get("/{difficulty}/{limit}"){
+            val difficulty = call.parameters["difficulty"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val limit = call.parameters["limit"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val response = recipeService.findRecipesByDifficulty(limit, difficulty, recipeImagesService)
+            if(response.isEmpty()){
+                call.respond(HttpStatusCode.NoContent, "Recipes not found")
+            }
+            call.respond(HttpStatusCode.OK, response)
+        }
+    }
+}
+fun Route.quickRecipes(){
+    val recipeService by inject<RecipeService>()
+    val recipeImagesService by inject<RecipeImagesService>()
+    route("/quick-recipes"){
+        get("/{limit}"){
+            val limit = call.parameters["limit"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val response = recipeService.findQuickRecipes(limit, recipeImagesService)
             if(response.isEmpty()){
                 call.respond(HttpStatusCode.NoContent, "Recipes not found")
             }

@@ -92,4 +92,19 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
         return recipes
     }
 
+    suspend fun findRecipesByDifficulty(limit: Int, difficulty: String, recipeImagesService: RecipeImagesService): List<RecipeCardResponse> {
+        val recipes = recipeRepository.findRecipeCardsByDifficulty(limit, difficulty)
+        for(recipe in recipes){
+            recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
+        }
+        return recipes
+    }
+    suspend fun findQuickRecipes(limit: Int, recipeImagesService: RecipeImagesService): List<RecipeCardResponse> {
+        val recipes = recipeRepository.findQuickRecipes(limit)
+        for(recipe in recipes){
+            recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
+        }
+        return recipes
+    }
+
 }

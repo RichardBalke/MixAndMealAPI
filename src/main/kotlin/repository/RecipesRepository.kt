@@ -13,6 +13,9 @@ import models.tables.RecipeImages
 import org.h2.api.H2Type.row
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
+import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -24,6 +27,8 @@ interface RecipesRepository : CrudRepository<RecipeEntry, Int>{
     suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry>
     suspend fun findByRecipeId(recipeId: Int): RecipeEntry?
     suspend fun findPopularRecipes(limit: Int): List<RecipeCardResponse>
+    suspend fun findRecipeCardsByDifficulty(limit: Int, difficulty: String): List<RecipeCardResponse>
+    suspend fun findQuickRecipes(limit: Int): List<RecipeCardResponse>
 
 //    suspend fun updateImage(recipeID: Long, imageUrl: String): Boolean
 //    suspend fun findByFavourites(favourites : Favourites): List<Recipes>
@@ -121,6 +126,35 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
                 it[Recipes.cookingTime],
                 mutableListOf()
             )
+            }
+            .toList()
+    }
+
+    override suspend fun findRecipeCardsByDifficulty(limit: Int, difficulty: String): List<RecipeCardResponse> = transaction {
+        table.select(Recipes.id, Recipes.title, Recipes.description, Recipes.cookingTime)
+            .where(Recipes.difficulty eq difficulty)
+            .limit(limit)
+            .map{RecipeCardResponse(
+                recipeId = it[Recipes.id],
+                it[Recipes.title],
+                it[Recipes.description],
+                it[Recipes.cookingTime],
+                mutableListOf())
+            }
+            .toList()
+    }
+
+    override suspend fun findQuickRecipes(limit: Int): List<RecipeCardResponse> = transaction {
+        table.select(Recipes.id, Recipes.title, Recipes.description, Recipes.cookingTime)
+            .where(Recipes.cookingTime.lessEq(30))
+            .orderBy(Recipes.cookingTime)
+            .limit(limit)
+            .map{RecipeCardResponse(
+                recipeId = it[Recipes.id],
+                it[Recipes.title],
+                it[Recipes.description],
+                it[Recipes.cookingTime],
+                mutableListOf())
             }
             .toList()
     }

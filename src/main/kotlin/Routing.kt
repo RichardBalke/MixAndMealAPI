@@ -4,6 +4,8 @@ import api.routes.featuredRecipeDetails
 import api.routes.fullRecipe
 import api.routes.ingredientsRoutes
 import api.routes.popularRecipes
+import api.routes.quickRecipes
+import api.routes.recipeCardsByDifficulty
 import api.routes.userRoutes
 import api.routes.recipesRoutes
 import api.routes.userFridgeRoutes
@@ -28,13 +30,12 @@ fun Application.configureRouting(
         recipesRoutes()
         fullRecipe()
         popularRecipes()
+        recipeCardsByDifficulty()
+        quickRecipes()
         userFridgeRoutes()
         signUp()
         signIn(tokenService, tokenConfig)
         authenticated()
         getSecretInfo()
-        get("/") {
-            call.respondText("Hello World!")
-        }
     }
 }
