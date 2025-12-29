@@ -1,6 +1,7 @@
 package routes
 
 import api.repository.UserRepositoryImpl
+import api.responses.RoleResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -18,7 +19,6 @@ import requests.AuthRequest
 import requests.Login
 import responses.AuthResponse
 import service.JwtService
-import service.RecipeService
 import service.UserService
 import service.requireAdmin
 import kotlin.getValue
@@ -96,11 +96,13 @@ fun Route.signIn(
 
 fun Route.authenticated() {
     authenticate {
-        get("/authenticate"){
+        post("/authenticate"){
             if(call.requireAdmin()){
-                call.respond(HttpStatusCode.OK, "You are an admin")
+                val role = RoleResponse("ADMIN")
+                call.respond(HttpStatusCode.OK, role)
             } else {
-                call.respond(HttpStatusCode.Unauthorized)
+                val role = RoleResponse("USER")
+                call.respond(HttpStatusCode.OK, role)
             }
         }
     }
