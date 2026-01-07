@@ -1,6 +1,7 @@
 package routes
 
 import api.repository.UserRepositoryImpl
+import api.responses.RoleResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -17,7 +18,6 @@ import org.koin.ktor.ext.inject
 import requests.AuthRequest
 import requests.Login
 import responses.AuthResponse
-import responses.RoleResponse
 import service.JwtService
 import service.RecipeService
 import service.UserService
@@ -106,8 +106,7 @@ fun Route.authenticated() {
                 // Returns {"role": "ADMIN"}
                 call.respond(HttpStatusCode.OK, RoleResponse("ADMIN"))
             } else {
-                // Returns {"role": "USER"}
-                call.respond(HttpStatusCode.OK, RoleResponse("USER"))
+                call.respond(HttpStatusCode.Unauthorized)
             }
         }
     }

@@ -9,15 +9,21 @@ import models.dto.RecipeImageEntry
 import models.tables.Recipes
 import models.tables.RecipeDiets
 import models.tables.Diets
+import models.tables.IngredientUnits
+import models.tables.RecipeAllergens
 import models.tables.RecipeImages
 import org.h2.api.H2Type.row
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
+import org.jetbrains.exposed.sql.alias
+import org.jetbrains.exposed.sql.leftJoin
+import org.jetbrains.exposed.sql.lowerCase
 import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import requests.RecipeSearchRequest
 
 interface RecipesRepository : CrudRepository<RecipeEntry, Int>{
     suspend fun findByTitle(title: String): List<RecipeEntry>
@@ -159,4 +165,51 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
             .toList()
     }
 
+//    suspend fun searchRecipes(request: RecipeSearchRequest): List<RecipeEntry> = transaction {
+//        val baseQuery = Recipes
+//            .leftJoin(RecipeAllergens, { Recipes.id }, { recipeId })
+//            .leftJoin(RecipeDiets, { Recipes.id }, { recipeId })
+//            .leftJoin(IngredientUnits, { RecipeDiets.recipeId }, { recipeId })
+//            .slice(
+//                Recipes.title,
+//                Recipes.difficulty,
+//                Recipes.mealType,
+//                Recipes.kitchenStyle,
+//                Recipes.cookingTime.max().alias("cookingtime"),
+//                RecipeDiets.dietId.cast<String>().stringAgg().alias("diets"),
+//                IngredientUnits.ingredientName.stringAgg().alias("ingredients"),
+//                RecipeAllergens.allergenId.cast<String>()
+//                    .stringAgg().coalesce("No Allergens").alias("allergens")
+//            )
+//            .groupBy(
+//                Recipes.title,
+//                Recipes.difficulty,
+//                Recipes.mealType,
+//                Recipes.kitchenStyle
+//            )
+//
+//        // Apply dynamic filters ONLY on the main recipes table
+//        var query = baseQuery
+//        if (request.partialTitle.isNotBlank()) {
+//            query = query.having {
+//                Recipes.title.lowerCase() like "%${request.partialTitle.lowercase()}%"
+//            }
+//        }
+//        if (request.difficulty.isNotBlank()) {
+//            query = query.having { Recipes.difficulty eq request.difficulty }
+//        }
+//        if (request.mealType.isNotBlank()) {
+//            query = query.having { Recipes.mealType eq request.mealType }
+//        }
+//        if (request.kitchenStyle.isNotBlank()) {
+//            query = query.having { Recipes.kitchenStyle eq request.kitchenStyle }
+//        }
+//        if (request.maxCookingTime > 0) {
+//            query = query.having {
+//                Recipes.cookingTime.max() lessEq request.maxCookingTime
+//            }
+//        }
+//
+//        query.map { toEntity }
+//    }
 }
