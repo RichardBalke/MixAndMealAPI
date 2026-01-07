@@ -106,11 +106,13 @@ fun Route.authenticated() {
                 // Returns {"role": "ADMIN"}
                 call.respond(HttpStatusCode.OK, RoleResponse("ADMIN"))
             } else {
-                call.respond(HttpStatusCode.Unauthorized)
+                // Returns {"role": "USER"}
+                call.respond(HttpStatusCode.OK, RoleResponse("USER"))
             }
         }
     }
 }
+
 
 
 fun Route.getSecretInfo(){
