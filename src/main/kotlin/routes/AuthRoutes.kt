@@ -17,11 +17,13 @@ import org.koin.ktor.ext.inject
 import requests.AuthRequest
 import requests.Login
 import responses.AuthResponse
+import responses.RoleResponse
 import service.JwtService
 import service.RecipeService
 import service.UserService
 import service.requireAdmin
 import kotlin.getValue
+
 
 
 fun Route.signUp(){
@@ -96,15 +98,21 @@ fun Route.signIn(
 
 fun Route.authenticated() {
     authenticate {
-        get("/authenticate"){
-            if(call.requireAdmin()){
-                call.respond(HttpStatusCode.OK, "You are an admin")
+        get("/authenticate") {
+            // This logic looks okay, assuming requireAdmin() works correctly
+            val isAdmin = call.requireAdmin()
+
+            if (isAdmin) {
+                // Returns {"role": "ADMIN"}
+                call.respond(HttpStatusCode.OK, RoleResponse("ADMIN"))
             } else {
-                call.respond(HttpStatusCode.Unauthorized)
+                // Returns {"role": "USER"}
+                call.respond(HttpStatusCode.OK, RoleResponse("USER"))
             }
         }
     }
 }
+
 
 fun Route.getSecretInfo(){
     authenticate {

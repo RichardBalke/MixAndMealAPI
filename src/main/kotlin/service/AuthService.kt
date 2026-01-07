@@ -19,12 +19,17 @@ suspend fun ApplicationCall.authenticatedUserId(): String {
 
 suspend fun ApplicationCall.requireAdmin(): Boolean {
     val principal = authentication.principal<JWTPrincipal>()
-    val id = principal?.getClaim("email", String::class)
+    // Change "email" to "userId" to match your signIn token generation
+    val id = principal?.getClaim("userId", String::class)
+
     if (id != null) {
         val role = UserRepositoryImpl().getRoleById(id)
         return (role == Role.ADMIN)
     } else {
         return false
     }
-
 }
+
+
+
+
