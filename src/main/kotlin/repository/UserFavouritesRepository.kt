@@ -5,6 +5,7 @@ import api.repository.CrudImplementation
 import api.repository.CrudRepository
 import models.tables.UserFavourites
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface UserFavouritesRepository : CrudRepository<UserFavouritesEntry, UserFavouritesEntry> {
@@ -33,8 +34,10 @@ class UserFavouritesRepositoryImpl :
 
     override suspend fun getFavouritesForUser(userId: String): List<UserFavouritesEntry> = transaction {
         UserFavourites
-            .select(UserFavourites.userId eq userId)
+            .selectAll()
+            .where(UserFavourites.userId eq userId)
             .map(toEntity)
+            .toList()
     }
 
     override suspend fun addFavourite(userId: String, recipeId: Int): UserFavouritesEntry {

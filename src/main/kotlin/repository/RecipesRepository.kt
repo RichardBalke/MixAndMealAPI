@@ -6,12 +6,14 @@ import models.enums.KitchenStyle
 import models.enums.MealType
 import models.dto.RecipeEntry
 import models.dto.RecipeImageEntry
+import models.dto.UserFavouritesEntry
 import models.tables.Recipes
 import models.tables.RecipeDiets
 import models.tables.Diets
 import models.tables.IngredientUnits
 import models.tables.RecipeAllergens
 import models.tables.RecipeImages
+import models.tables.UserFavourites
 import org.h2.api.H2Type.row
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -35,6 +37,7 @@ interface RecipesRepository : CrudRepository<RecipeEntry, Int>{
     suspend fun findPopularRecipes(limit: Int): List<RecipeCardResponse>
     suspend fun findRecipeCardsByDifficulty(limit: Int, difficulty: String): List<RecipeCardResponse>
     suspend fun findQuickRecipes(limit: Int): List<RecipeCardResponse>
+    suspend fun findFavoriteRecipes(recipeIds: List<UserFavouritesEntry>): List<RecipeCardResponse>
 
 //    suspend fun updateImage(recipeID: Long, imageUrl: String): Boolean
 //    suspend fun findByFavourites(favourites : Favourites): List<Recipes>
@@ -116,7 +119,7 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
 
     override suspend fun findByRecipeId(recipeId: Int): RecipeEntry? = transaction {
         table.selectAll()
-            .where { Recipes.id eq recipeId }
+            .where(Recipes.id eq recipeId)
             .mapNotNull(toEntity)
             .firstOrNull()
     }
@@ -163,6 +166,24 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
                 mutableListOf())
             }
             .toList()
+    }
+
+    override suspend fun findFavoriteRecipes(recipeIds: List<UserFavouritesEntry>): List<RecipeCardResponse> {
+        val list = mutableListOf<RecipeCardResponse>()
+        for(recipeId in recipeIds){
+            list.addAll(
+                transaction { table.select(Recipes.id, Recipes.title, Recipes.description, Recipes.cookingTime)
+                    .where(Recipes.id eq recipeId.recipeId)
+                    .map{RecipeCardResponse(
+                        recipeId = it[Recipes.id],
+                        it[Recipes.title],
+                        it[Recipes.description],
+                        it[Recipes.cookingTime],
+                        mutableListOf())
+                    } }
+            )
+        }
+        return list
     }
 
 //    suspend fun searchRecipes(request: RecipeSearchRequest): List<RecipeEntry> = transaction {

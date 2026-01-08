@@ -88,7 +88,9 @@ fun Route.signIn(
             TokenClaim(
                 name = "userId",
                 value = user.email
-            )
+            ),
+            TokenClaim(name = "userName",
+                value = user.name)
         )
         call.respond(status = HttpStatusCode.OK,
             message = AuthResponse(token = token))
@@ -99,15 +101,18 @@ fun Route.signIn(
 fun Route.authenticated() {
     authenticate {
         get("/authenticate") {
+            val principal = call.principal<JWTPrincipal>()
+            val userId = principal?.getClaim("userId", String::class)?: ""
+            val userName = principal?.getClaim("userName", String::class)?: ""
             // This logic looks okay, assuming requireAdmin() works correctly
             val isAdmin = call.requireAdmin()
 
             if (isAdmin) {
                 // Returns {"role": "ADMIN"}
-                call.respond(HttpStatusCode.OK, RoleResponse("ADMIN"))
+                call.respond(HttpStatusCode.OK, RoleResponse("ADMIN", userId, userName))
             } else {
                 // Returns {"role": "USER"}
-                call.respond(HttpStatusCode.OK, RoleResponse("USER"))
+                call.respond(HttpStatusCode.OK, RoleResponse("USER", userId, userName))
             }
         }
     }

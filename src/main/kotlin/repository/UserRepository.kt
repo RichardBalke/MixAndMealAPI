@@ -1,6 +1,7 @@
 package api.repository
 
 import api.models.Role
+import api.responses.RecipeCardResponse
 import models.dto.UserEntry
 import models.tables.Users
 import org.jetbrains.exposed.sql.selectAll
@@ -50,5 +51,7 @@ class UserRepositoryImpl : UserRepository, CrudImplementation<UserEntry, String>
         }
         return user.role
     }
+
+
 }
 

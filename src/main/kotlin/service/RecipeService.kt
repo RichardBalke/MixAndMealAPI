@@ -4,6 +4,7 @@ import api.repository.RecipesRepository
 import api.repository.RecipesRepositoryImpl
 import api.responses.RecipeCardResponse
 import models.dto.RecipeEntry
+import models.dto.UserFavouritesEntry
 import models.tables.Recipes
 import org.koin.java.KoinJavaComponent.inject
 import repository.RecipeAllergensRepositoryImpl
@@ -81,6 +82,14 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
     }
     suspend fun findQuickRecipes(limit: Int, recipeImagesService: RecipeImagesService): List<RecipeCardResponse> {
         val recipes = recipeRepository.findQuickRecipes(limit)
+        for(recipe in recipes){
+            recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
+        }
+        return recipes
+    }
+
+    suspend fun findFavouriteRecipes(recipeIds: List<UserFavouritesEntry>, recipeImagesService: RecipeImagesService) : List<RecipeCardResponse>{
+        val recipes = recipeRepository.findFavoriteRecipes(recipeIds)
         for(recipe in recipes){
             recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
         }
