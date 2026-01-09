@@ -9,7 +9,7 @@ import io.ktor.server.auth.jwt.JWTPrincipal
 
 suspend fun ApplicationCall.authenticatedUserId(): String {
     val principal = authentication.principal<JWTPrincipal>()
-    val id = principal?.getClaim("email", String::class)
+    val id = principal?.getClaim("userId", String::class)
     if (id != null) {
         return id
     } else {

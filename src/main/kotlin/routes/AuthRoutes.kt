@@ -27,13 +27,12 @@ import kotlin.getValue
 
 
 fun Route.signUp(){
-    val userRepo = UserRepositoryImpl()
+    val userService by inject<UserService>()
     post("/signup"){
         val request = call.receiveNullable<AuthRequest>() ?: kotlin.run{
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-
 
         val areFieldsBlank = request.username.isBlank() || request.password.isBlank()
         val isPwTooShort = request.password.length < 2
@@ -42,7 +41,7 @@ fun Route.signUp(){
             return@post
         }
 
-        if(userRepo.findByEmail(request.email) != null){
+        if(userService.getByEmail(request.email) != null){
             call.respond(HttpStatusCode.Conflict, "User already exists")
         }
 
@@ -51,7 +50,7 @@ fun Route.signUp(){
             password = request.password,
             email = request.email,
         )
-        userRepo.create(user)
+        userService.create(user)
 
         call.respond(HttpStatusCode.OK)
 

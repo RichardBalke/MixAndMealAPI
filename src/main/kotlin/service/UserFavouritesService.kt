@@ -16,4 +16,9 @@ class UserFavouritesService(private val userFavouritesRepository: UserFavourites
     suspend fun removeUserFavouritesEntry(userId: String, recipeId: Int) {
         userFavouritesRepository.removeFavourite(userId, recipeId)
     }
+
+    suspend fun checkFavouriteExists(userId: String, recipeId: Int): Boolean {
+        val userFavourite = userFavouritesRepository.checkFavouriteExists(userId, recipeId)
+        return userFavourite.isNotEmpty()
+    }
 }

@@ -1,5 +1,7 @@
 package routes
 
+import api.requests.RecipeIDRequest
+import api.responses.RecipeCardResponse
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.request.*
@@ -8,45 +10,49 @@ import service.UserFavouritesService
 import models.dto.UserFavouritesEntry
 import io.ktor.server.routing.Route
 import io.ktor.http.*
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
+import io.ktor.server.response.respond
+import org.koin.ktor.ext.inject
+import service.RecipeImagesService
+import service.RecipeService
 
-fun Route.userFavouritesRoutes(userFavouritesService: UserFavouritesService) {
+fun Route.userFavouritesRoutes() {
+    val recipeService by inject<RecipeService>()
+    val userFavouritesService by inject<UserFavouritesService>()
+    val recipeImagesService by inject<RecipeImagesService>()
 
     route("/favourites") {
-
-        get("/{userId}") {
-            val userId = call.parameters["userId"] ?: return@get call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
+        get(){
+            val principal = call.principal<JWTPrincipal>()
+            val userId = principal?.getClaim("userId", String::class)!!
             val favourites: List<UserFavouritesEntry> = userFavouritesService.getUserFavouritesEntries(userId)
-            call.respond(favourites)
+            val recipes = mutableListOf<RecipeCardResponse>()
+
+            if (favourites.isNotEmpty()) {
+                recipes.addAll(recipeService.findFavouriteRecipes(favourites, recipeImagesService))
+            }
+
+            call.respond(HttpStatusCode.OK,recipes)
         }
 
-        post("/{userId}/recipe") {
-            val userId = call.parameters["userId"] ?: return@post call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val recipeId = call.receive<Map<String, Int>>()["recipeId"]
-                ?: return@post call.respondText("Missing recipeId", status = HttpStatusCode.BadRequest)
 
-            try {
+        post("/add-remove-favourite-recipe") {
+            val principal = call.principal<JWTPrincipal>()
+            val userId = principal?.getClaim("userId", String::class)!!
+            val recipeId = call.receive<RecipeIDRequest>().recipeId
+
+            val isFavourite = userFavouritesService.checkFavouriteExists(userId, recipeId)
+
+            if(isFavourite) {
                 val entry = userFavouritesService.addUserFavouritesEntry(
                     UserFavouritesEntry(userId = userId, recipeId = recipeId)
                 )
                 call.respond(HttpStatusCode.Created, entry)
-            } catch (e: IllegalArgumentException) {
-                call.respond(HttpStatusCode.Conflict, e.message ?: "Favourite already exists")
             }
-        }
-
-        delete("/{userId}/recipe") {
-            val userId = call.parameters["userId"] ?: return@delete call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val recipeId = call.receive<Map<String, Int>>()["recipeId"]
-                ?: return@delete call.respondText("Missing recipeId", status = HttpStatusCode.BadRequest)
-
-            userFavouritesService.removeUserFavouritesEntry(userId, recipeId)
-            call.respond(HttpStatusCode.NoContent)
+            else{
+                userFavouritesService.removeUserFavouritesEntry(userId, recipeId)
+            }
         }
     }
 }

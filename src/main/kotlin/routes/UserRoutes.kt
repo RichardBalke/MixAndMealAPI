@@ -2,12 +2,21 @@ package api.routes
 
 import api.repository.UserRepositoryImpl
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
+import models.dto.UserFridgeEntry
 import org.koin.ktor.ext.inject
+import service.RecipeImagesService
+import service.RecipeService
+import service.UserAllergensService
+import service.UserFavouritesService
+import service.UserFridgeService
 import service.UserService
 import service.authenticatedUserId
 import service.requireAdmin
@@ -16,8 +25,10 @@ import kotlin.getValue
 
 fun Route.userRoutes() {
     val userService by inject<UserService>()
+
     // authenticate zorgt ervoor dat alleen ingelogde users de routes kunnen gebruiken.
     authenticate {
+
         route("/users") {
 
             get {
@@ -50,116 +61,6 @@ fun Route.userRoutes() {
                     call.respond(HttpStatusCode.Unauthorized)
                 }
             }
-
-
-
-//            post("/favourites"){
-//                val principal = call.principal<JWTPrincipal>()
-//                val userId = principal?.getClaim("userId", String::class)?.toIntOrNull()
-//                    ?: return@post call.respond(HttpStatusCode.BadRequest, "User is not in token")
-//
-//                val user = userRepo.findById(userId)
-//                    ?: return@post call.respond(HttpStatusCode.NotFound, "user not found")
-//
-//                val request = call.receiveNullable<Recipes>() ?: kotlin.run{
-//                    call.respond(HttpStatusCode.BadRequest)
-//                    return@post
-//                }
-//
-//                if(user.favourites.any{it.id == request.id }) {
-//                    user.favourites.remove(request)
-//                    call.respond(HttpStatusCode.Accepted, user.favourites)
-//                }
-//                else{
-//                    user.favourites.add(request)
-//                    call.respond(HttpStatusCode.Accepted, user.favourites)
-//                }
-//            }
-//
-//            get("/favourites") {
-//                val principal = call.principal<JWTPrincipal>()
-//                val userId = principal?.getClaim("userId", String::class)?.toInt()
-//                    ?: return@get call.respond(HttpStatusCode.BadRequest, "User is not in token")
-//
-//                val user = userRepo.findById(userId)
-//                    ?: return@get call.respond(HttpStatusCode.NotFound, "user not found")
-//
-//                call.respond(HttpStatusCode.OK, user.favourites)
-//            }
-//
-//            post("/fridge"){
-//                val principal = call.principal<JWTPrincipal>()
-//                val userId = principal?.getClaim("userId", String::class)?.toIntOrNull()
-//                    ?: return@post call.respond(HttpStatusCode.BadRequest, "User is not in token")
-//
-//                val user = userRepo.findById(userId)
-//                    ?: return@post call.respond(HttpStatusCode.NotFound, "user not found")
-//
-//                val request = call.receiveNullable<Ingredients>() ?: kotlin.run{
-//                    call.respond(HttpStatusCode.BadRequest)
-//                    return@post
-//                }
-//
-//                if(user.fridge.any{it.id == request.id }) {
-//                    user.fridge.remove(request)
-//                    call.respond(HttpStatusCode.Accepted, user.fridge)
-//                }
-//                else{
-//                    user.fridge.add(request)
-//                    call.respond(HttpStatusCode.Accepted, user.fridge)
-//                }
-//            }
-//
-//            get("/fridge") {
-//                val principal = call.principal<JWTPrincipal>()
-//                val userId = principal?.getClaim("userId", String::class)?.toInt()
-//                    ?: return@get call.respond(HttpStatusCode.BadRequest, "User is not in token")
-//
-//                val user = userRepo.findById(userId)
-//                    ?: return@get call.respond(HttpStatusCode.NotFound, "user not found")
-//
-//                call.respond(HttpStatusCode.OK, user.fridge)
-//            }
-//
-//            post("/allergens"){
-//                val principal = call.principal<JWTPrincipal>()
-//                val userId = principal?.getClaim("userId", String::class)?.toIntOrNull()
-//                    ?: return@post call.respond(HttpStatusCode.Forbidden, "User is not in token")
-//
-//                val user = userRepo.findById(userId)
-//                    ?: return@post call.respond(HttpStatusCode.NotFound, "user not found")
-//
-//                val request = call.receiveNullable<Allergens>() ?: kotlin.run{
-//                    call.respond(HttpStatusCode.Forbidden, "Allergen is not correct")
-//                    return@post
-//                }
-//
-//                if(user.allergens.any{it.id == request.id }) {
-//                    user.allergens.remove(request)
-//                    call.respond(HttpStatusCode.Accepted, user.allergens)
-//                }
-//                else{
-//                    user.allergens.add(request)
-//                    call.respond(HttpStatusCode.Accepted, user.allergens)
-//                }
-//            }
-//
-//            get("/allergens") {
-//                val principal = call.principal<JWTPrincipal>()
-//                val userId = principal?.getClaim("userId", String::class)?.toInt()
-//                    ?: return@get call.respond(HttpStatusCode.BadRequest, "User is not in token")
-//
-//                val user = userRepo.findById(userId)
-//                    ?: return@get call.respond(HttpStatusCode.NotFound, "user not found")
-//
-//                call.respond(HttpStatusCode.OK, user.allergens)
-//            }
-//
-//            post {
-//                val newUser = call.receive<User>()
-//                val created = userRepo.create(newUser)
-//                call.respond(HttpStatusCode.Created, created)
-//            }
 
         }
     }

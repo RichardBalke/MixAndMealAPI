@@ -5,6 +5,7 @@ import api.repository.CrudImplementation
 import api.repository.CrudRepository
 import models.tables.UserFavourites
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -12,6 +13,7 @@ interface UserFavouritesRepository : CrudRepository<UserFavouritesEntry, UserFav
     suspend fun getFavouritesForUser(userId: String): List<UserFavouritesEntry>
     suspend fun addFavourite(userId: String, recipeId: Int): UserFavouritesEntry
     suspend fun removeFavourite(userId: String, recipeId: Int)
+    suspend fun checkFavouriteExists(userId: String, recipeId: Int) : List<UserFavouritesEntry>
 }
 
 class UserFavouritesRepositoryImpl :
@@ -47,5 +49,12 @@ class UserFavouritesRepositoryImpl :
 
     override suspend fun removeFavourite(userId: String, recipeId: Int) {
         delete(UserFavouritesEntry(userId, recipeId))
+    }
+
+    override suspend fun checkFavouriteExists(userId: String, recipeId: Int): List<UserFavouritesEntry> = transaction {
+        UserFavourites.selectAll()
+            .where(UserFavourites.userId eq userId)
+            .where(UserFavourites.recipeId eq recipeId)
+            .map(toEntity)
     }
 }

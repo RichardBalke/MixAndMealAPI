@@ -11,4 +11,8 @@ class UserService(private val userRepository: UserRepository) {
     suspend fun getAll(): List<UserEntry> {
         return userRepository.findAll()
     }
+
+    suspend fun create(userEntry: UserEntry): UserEntry {
+        return userRepository.create(userEntry)
+    }
 }
