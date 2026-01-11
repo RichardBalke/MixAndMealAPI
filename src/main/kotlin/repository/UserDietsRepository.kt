@@ -6,6 +6,7 @@ import api.repository.CrudRepository
 import models.dto.UserEntry
 import models.tables.UserDiets
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface UserDietsRepository : CrudRepository<UserDietEntry, UserDietEntry> {
@@ -34,7 +35,8 @@ class UserDietsRepositoryImpl :
 
     override suspend fun getDietsForUser(userId: String): List<UserDietEntry> = transaction {
         UserDiets
-            .select(UserDiets.userId eq userId)
+            .selectAll()
+            .where(UserDiets.userId eq userId)
             .mapNotNull(toEntity)
             .toList()
     }

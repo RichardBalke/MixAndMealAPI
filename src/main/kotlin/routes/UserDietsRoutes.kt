@@ -25,9 +25,7 @@ fun Route.userDietsRoutes() {
             get() {
                 val principal = call.principal<JWTPrincipal>()
                 val userId = principal?.getClaim("userId", String::class)!!
-
                 val userDiets: List<UserDietEntry> = userDietsService.getUserDietEntries(userId)
-
                 val diets = mutableListOf<DietEntry>()
 
                 if (userDiets.isNotEmpty()) {

@@ -4,9 +4,12 @@ import api.repository.CrudImplementation
 import api.repository.CrudRepository
 import models.dto.DietEntry
 import models.tables.Diets
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 
 interface DietsRepository : CrudRepository<DietEntry, Int> {
-
+    suspend fun findByDietId(dietId: Int) : DietEntry
 }
 
 class DietsRepositoryImpl() : DietsRepository, CrudImplementation<DietEntry, Int>(
@@ -21,4 +24,11 @@ class DietsRepositoryImpl() : DietsRepository, CrudImplementation<DietEntry, Int
         stmt[Diets.displayName] = diet.displayName
         stmt[Diets.description] = diet.description
     }
-) {}
+) {
+    override suspend fun findByDietId(dietId: Int) : DietEntry = transaction {
+        table.selectAll()
+            .where(Diets.id eq dietId)
+            .map(toEntity)
+            .single()
+    }
+}

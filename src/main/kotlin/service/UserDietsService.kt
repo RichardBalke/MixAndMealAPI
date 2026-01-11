@@ -22,9 +22,7 @@ class UserDietsService(private val userDietsRepository: UserDietsRepository) {
         val result = mutableListOf<DietEntry>()
         for (entry in entries) {
             val diet = dietsService.getDietById(entry.dietId)
-            if (diet != null) {
-                result.add(diet)
-            }
+            result.add(diet)
         }
         return result
     }

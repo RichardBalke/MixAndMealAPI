@@ -42,17 +42,18 @@ fun Route.userFavouritesRoutes() {
             post("/add-remove-favourite-recipe") {
                 val principal = call.principal<JWTPrincipal>()
                 val userId = principal?.getClaim("userId", String::class)!!
-                val recipeId = call.receive<RecipeIDRequest>().recipeId
+                val recipeId = call.receive<RecipeIDRequest>()
 
-                val isFavourite = userFavouritesService.checkFavouriteExists(userId, recipeId)
+                val isFavourite = userFavouritesService.checkFavouriteExists(userId, recipeId.recipeId)
 
                 if (isFavourite) {
                     val entry = userFavouritesService.addUserFavouritesEntry(
-                        UserFavouritesEntry(userId = userId, recipeId = recipeId)
+                        UserFavouritesEntry(userId = userId, recipeId = recipeId.recipeId)
                     )
                     call.respond(HttpStatusCode.Created, entry)
                 } else {
-                    userFavouritesService.removeUserFavouritesEntry(userId, recipeId)
+                    userFavouritesService.removeUserFavouritesEntry(userId, recipeId.recipeId)
+                    call.respond(HttpStatusCode.NoContent)
                 }
             }
         }

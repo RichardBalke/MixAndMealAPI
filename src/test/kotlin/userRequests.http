@@ -174,5 +174,38 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "recipeId": 2
+  "recipeId": 1
 }
+
+###
+GET http://127.0.0.1:8080/user-diets
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+POST http://127.0.0.1:8080/user-diets/add-diet
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "displayName": "Veganistisch",
+  "description": "Geen dierlijke producten."
+}
+
+###
+DELETE http://127.0.0.1:8080/user-diets/remove-diet
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "displayName": "Veganistisch",
+  "description": "Geen dierlijke producten."
+}
+
+###
+GET http://127.0.0.1:8080/getdiet
+
+###
+GET http://127.0.0.1:8080/getdiet/user-1

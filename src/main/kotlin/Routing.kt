@@ -1,5 +1,6 @@
 package api
 
+import api.routes.dietRoutes
 import api.routes.featuredRecipeDetails
 import api.routes.fullRecipe
 import api.routes.ingredientsRoutes
@@ -40,5 +41,6 @@ fun Application.configureRouting(
         getSecretInfo()
         userDietsRoutes()
         userFavouritesRoutes()
+        dietRoutes()
     }
 }
