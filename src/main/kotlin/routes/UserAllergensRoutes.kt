@@ -7,47 +7,49 @@ import io.ktor.server.routing.*
 import service.UserAllergensService
 import models.dto.UserAllergenEntry
 import io.ktor.http.*
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
+import org.koin.ktor.ext.inject
 
-fun Route.userAllergensRoutes(userAllergensService: UserAllergensService) {
+fun Route.userAllergensRoutes() {
+    val userAllergensService by inject<UserAllergensService>()
 
-    route("/allergens") {
+    authenticate {
+        route("/allergens") {
 
-        // GET /allergens/{userId} - haal alle allergens voor een user
-        get("/{userId}") {
-            val userId = call.parameters["userId"] ?: return@get call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
+            // GET /allergens
+            get {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
 
-            val allergens = userAllergensService.getUserAllergenEntries(userId)
-            call.respond(allergens)
-        }
-
-        // POST /allergens/{userId}/allergen - voeg een allergen toe
-        post("/{userId}/allergen") {
-            val userId = call.parameters["userId"] ?: return@post call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val allergenId = call.receive<Map<String, Int>>()["allergenId"]
-                ?: return@post call.respondText("Missing allergenId", status = HttpStatusCode.BadRequest)
-
-            try {
-                val entry = userAllergensService.addUserAllergenEntry(userId, allergenId)
-                call.respond(HttpStatusCode.Created, entry)
-            } catch (e: IllegalArgumentException) {
-                call.respond(HttpStatusCode.Conflict, e.message ?: "Allergen already exists")
+                val allergens = userAllergensService.getUserAllergenEntries(userId)
+                call.respond(HttpStatusCode.OK, allergens)
             }
-        }
 
-        // DELETE /allergens/{userId}/allergen - verwijder een allergen
-        delete("/{userId}/allergen") {
-            val userId = call.parameters["userId"] ?: return@delete call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val allergenId = call.receive<Map<String, Int>>()["allergenId"]
-                ?: return@delete call.respondText("Missing allergenId", status = HttpStatusCode.BadRequest)
+            // POST /allergens/add-remove-allergen
+            post("/add-remove-allergen") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
 
-            userAllergensService.removeUserAllergenEntry(userId, allergenId)
-            call.respond(HttpStatusCode.NoContent)
+                val allergenId = call.receive<Map<String, Int>>()["allergenId"]
+                    ?: return@post call.respond(
+                        HttpStatusCode.BadRequest,
+                        "Missing allergenId"
+                    )
+
+                val existingAllergens =
+                    userAllergensService.getUserAllergenEntries(userId)
+                        .map { it.allergenId }
+
+                if (!existingAllergens.contains(allergenId)) {
+                    val entry = userAllergensService.addUserAllergenEntry(userId, allergenId)
+                    call.respond(HttpStatusCode.Created, entry)
+                } else {
+                    userAllergensService.removeUserAllergenEntry(userId, allergenId)
+                    call.respond(HttpStatusCode.NoContent)
+                }
+            }
         }
     }
 }

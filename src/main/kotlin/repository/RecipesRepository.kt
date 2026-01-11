@@ -38,6 +38,7 @@ interface RecipesRepository : CrudRepository<RecipeEntry, Int>{
     suspend fun findRecipeCardsByDifficulty(limit: Int, difficulty: String): List<RecipeCardResponse>
     suspend fun findQuickRecipes(limit: Int): List<RecipeCardResponse>
     suspend fun findFavoriteRecipes(recipeIds: List<UserFavouritesEntry>): List<RecipeCardResponse>
+    suspend fun findAllRecipesAsRecipeCards(): List<RecipeCardResponse>
 
 //    suspend fun updateImage(recipeID: Long, imageUrl: String): Boolean
 //    suspend fun findByFavourites(favourites : Favourites): List<Recipes>
@@ -122,6 +123,19 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
             .where(Recipes.id eq recipeId)
             .mapNotNull(toEntity)
             .firstOrNull()
+    }
+
+    override suspend fun findAllRecipesAsRecipeCards(): List<RecipeCardResponse> = transaction {
+        table.select(Recipes.id, Recipes.title, Recipes.description, Recipes.cookingTime)
+            .map {RecipeCardResponse(
+                recipeId = it[Recipes.id],
+                it[Recipes.title],
+                it[Recipes.description],
+                it[Recipes.cookingTime],
+                mutableListOf()
+            )
+            }
+            .toList()
     }
 
     override suspend fun findPopularRecipes(limit: Int): List<RecipeCardResponse> = transaction {
