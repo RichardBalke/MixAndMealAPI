@@ -33,8 +33,8 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
         return recipes.toList()
     }
 
-    suspend fun getAllRecipes(): List<RecipeEntry> {
-        return recipeRepository.findAll()
+    suspend fun getAllRecipes(): List<RecipeCardResponse> {
+        return recipeRepository.findAllRecipesAsRecipeCards()
     }
 
     suspend fun addRecipes(recipe: RecipeEntry) {

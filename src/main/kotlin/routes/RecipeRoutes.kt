@@ -149,11 +149,14 @@ fun Route.quickRecipes(){
 
 fun Route.recipesRoutes() {
     val recipeService by inject<RecipeService>()
+    val recipeImagesService by inject<RecipeImagesService>()
     route("/recipes") {
 
         // Get all recipes
         get {
-            call.respond(recipeService.getAllRecipes())
+            val recipes = recipeService.getAllRecipes()
+
+            call.respond(HttpStatusCode.OK, recipes)
         }
 
         post {
