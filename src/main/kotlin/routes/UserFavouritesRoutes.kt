@@ -47,13 +47,25 @@ fun Route.userFavouritesRoutes() {
                 val isFavourite = userFavouritesService.checkFavouriteExists(userId, recipeId.recipeId)
 
                 if (isFavourite) {
-                    val entry = userFavouritesService.addUserFavouritesEntry(
+                    userFavouritesService.addUserFavouritesEntry(
                         UserFavouritesEntry(userId = userId, recipeId = recipeId.recipeId)
                     )
-                    call.respond(HttpStatusCode.Created, entry)
+                    val favourites: List<UserFavouritesEntry> = userFavouritesService.getUserFavouritesEntries(userId)
+                    val recipes = mutableListOf<RecipeCardResponse>()
+
+                    if (favourites.isNotEmpty()) {
+                        recipes.addAll(recipeService.findFavouriteRecipes(favourites, recipeImagesService))
+                    }
+                    call.respond(HttpStatusCode.Created, recipes)
                 } else {
+                    val favourites: List<UserFavouritesEntry> = userFavouritesService.getUserFavouritesEntries(userId)
+                    val recipes = mutableListOf<RecipeCardResponse>()
+
+                    if (favourites.isNotEmpty()) {
+                        recipes.addAll(recipeService.findFavouriteRecipes(favourites, recipeImagesService))
+                    }
                     userFavouritesService.removeUserFavouritesEntry(userId, recipeId.recipeId)
-                    call.respond(HttpStatusCode.NoContent)
+                    call.respond(HttpStatusCode.OK, recipes)
                 }
             }
         }

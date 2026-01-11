@@ -34,12 +34,14 @@ fun Route.userFridgeRoutes() {
                 val ingredient = call.receive<IngredientIDRequest>()
                 println(ingredient)
                 try {
-                    val entry = userFridgeService.addUserFridgeEntry(
+                    userFridgeService.addUserFridgeEntry(
                         UserFridgeEntry(userId = userId, ingredientName = ingredient.ingredientName)
                     )
-                    call.respond(HttpStatusCode.Created, entry)
-                } catch (e: IllegalArgumentException) {
-                    call.respond(HttpStatusCode.Conflict, e.message ?: "Ingredient already exists")
+                    val fridge: List<UserFridgeEntry> = userFridgeService.getUserFridgeEntries(userId)
+                    call.respond(HttpStatusCode.Created, fridge)
+                } catch (e: Exception) {
+                    val fridge: List<UserFridgeEntry> = userFridgeService.getUserFridgeEntries(userId)
+                    call.respond(HttpStatusCode.Conflict, fridge)
                 }
             }
 
@@ -50,7 +52,9 @@ fun Route.userFridgeRoutes() {
                 val ingredient = call.receive<IngredientIDRequest>()
 
                 userFridgeService.removeUserFridgeEntry(userId, ingredient.ingredientName)
-                call.respond(HttpStatusCode.NoContent)
+                val fridge: List<UserFridgeEntry> = userFridgeService.getUserFridgeEntries(userId)
+
+                call.respond(HttpStatusCode.OK, fridge)
             }
         }
     }

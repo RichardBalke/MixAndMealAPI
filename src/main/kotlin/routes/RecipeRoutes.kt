@@ -153,21 +153,20 @@ fun Route.recipesRoutes() {
 
         // Get all recipes
         get {
-            val recipeRepo = RecipesRepositoryImpl()
-            call.respond(recipeRepo.findAll())
+            call.respond(recipeService.getAllRecipes())
         }
 
-            post {
-                if(call.requireAdmin()){
-                    val request = call.receive<RecipeEntry>()
-                    val created = recipeService.addRecipes(request)
-                    call.respond(HttpStatusCode.Created, created)
-                } else {
-                    call.respond(HttpStatusCode.Unauthorized)
-                }
-
+        post {
+            if (call.requireAdmin()) {
+                val request = call.receive<RecipeEntry>()
+                val created = recipeService.addRecipes(request)
+                call.respond(HttpStatusCode.Created, created)
+            } else {
+                call.respond(HttpStatusCode.Unauthorized)
             }
+
         }
+
 
         //Get recipes by title
         get("/title/{title}") {
@@ -196,7 +195,7 @@ fun Route.recipesRoutes() {
 
         authenticate {
             delete("/{id}") {
-                if(call.requireAdmin()){
+                if (call.requireAdmin()) {
                     // controleert of de parameter {id} in de url naar een Long type geconvert kan worden.
                     val id: Int = call.parameters["id"]?.toIntOrNull()
                         ?: return@delete call.respond(HttpStatusCode.BadRequest)
@@ -212,18 +211,19 @@ fun Route.recipesRoutes() {
                 }
             }
 
-        }
-        post("/ingredient"){
-            val ingredient = call.receive<IngredientEntry>()
-            val ingredientRepo = IngredientUnitRepositoryImpl()
-            val foundRecipes = ingredientRepo.findRecipesByIngredient(ingredient.name)
 
-            if(foundRecipes.isNotEmpty()) {
-                call.respond(HttpStatusCode.OK, foundRecipes)
+            post("/ingredient") {
+                val ingredient = call.receive<IngredientEntry>()
+                val ingredientRepo = IngredientUnitRepositoryImpl()
+                val foundRecipes = ingredientRepo.findRecipesByIngredient(ingredient.name)
+
+                if (foundRecipes.isNotEmpty()) {
+                    call.respond(HttpStatusCode.OK, foundRecipes)
+                } else {
+                    call.respond(HttpStatusCode.NotFound)
+                }
             }
-            else{
-                call.respond(HttpStatusCode.NotFound)
-            }
+        }
 
     }
 }

@@ -45,9 +45,22 @@ fun Route.userDietsRoutes() {
                     val entry = userDietsService.addUserDietEntry(
                         UserDietEntry(userId = userId, dietId = dietId.id)
                     )
-                    call.respond(HttpStatusCode.Created, entry)
-                } catch (e: IllegalArgumentException) {
-                    call.respond(HttpStatusCode.Conflict, e.message ?: "Diet already exists")
+                    val userDiets: List<UserDietEntry> = userDietsService.getUserDietEntries(userId)
+                    val diets = mutableListOf<DietEntry>()
+
+                    if (userDiets.isNotEmpty()) {
+                        diets.addAll(userDietsService.getDietsFromEntries(userDiets, dietsService))
+                    }
+                    call.respond(HttpStatusCode.Created, diets)
+
+                } catch (e: Exception) {
+                    val userDiets: List<UserDietEntry> = userDietsService.getUserDietEntries(userId)
+                    val diets = mutableListOf<DietEntry>()
+
+                    if (userDiets.isNotEmpty()) {
+                        diets.addAll(userDietsService.getDietsFromEntries(userDiets, dietsService))
+                    }
+                    call.respond(HttpStatusCode.Conflict, diets)
                 }
             }
 
@@ -58,7 +71,13 @@ fun Route.userDietsRoutes() {
                 val dietId = call.receive<DietEntry>()
 
                 userDietsService.removeUserDietEntry(userId, dietId.id)
-                call.respond(HttpStatusCode.NoContent)
+                val userDiets: List<UserDietEntry> = userDietsService.getUserDietEntries(userId)
+                val diets = mutableListOf<DietEntry>()
+
+                if (userDiets.isNotEmpty()) {
+                    diets.addAll(userDietsService.getDietsFromEntries(userDiets, dietsService))
+                }
+                call.respond(HttpStatusCode.OK, diets)
             }
         }
     }
