@@ -124,12 +124,12 @@ Authorization: Bearer {{token}}
 }
 
 ### get the list of allergens for signed in user
-GET http://127.0.0.1:8080/users/allergens
+GET http://127.0.0.1:8080/allergens
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### post add or remove allergen for signed in user
-POST http://127.0.0.1:8080/users/allergens
+POST http://127.0.0.1:8080/allergens/add-remove-allergen
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

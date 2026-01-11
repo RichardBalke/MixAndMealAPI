@@ -17,6 +17,7 @@ import routes.authenticated
 import routes.getSecretInfo
 import routes.signIn
 import routes.signUp
+import routes.userAllergensRoutes
 import routes.userDietsRoutes
 import routes.userFavouritesRoutes
 import service.JwtService
@@ -41,6 +42,7 @@ fun Application.configureRouting(
         getSecretInfo()
         userDietsRoutes()
         userFavouritesRoutes()
+        userAllergensRoutes()
         dietRoutes()
     }
 }
