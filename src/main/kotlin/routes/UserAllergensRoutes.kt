@@ -1,5 +1,6 @@
 package routes
 
+import api.requests.AllergenIDRequest
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.request.*
@@ -27,28 +28,34 @@ fun Route.userAllergensRoutes() {
                 call.respond(HttpStatusCode.OK, allergens)
             }
 
-            // POST /allergens/add-remove-allergen
-            post("/add-remove-allergen") {
+            // POST /allergens/add-allergen
+            post("/add-allergen") {
                 val principal = call.principal<JWTPrincipal>()
                 val userId = principal?.getClaim("userId", String::class)!!
 
-                val allergenId = call.receive<Map<String, Int>>()["allergenId"]
-                    ?: return@post call.respond(
-                        HttpStatusCode.BadRequest,
-                        "Missing allergenId"
-                    )
+                val request = call.receive<AllergenIDRequest>()
 
-                val existingAllergens =
-                    userAllergensService.getUserAllergenEntries(userId)
-                        .map { it.allergenId }
-
-                if (!existingAllergens.contains(allergenId)) {
-                    val entry = userAllergensService.addUserAllergenEntry(userId, allergenId)
-                    call.respond(HttpStatusCode.Created, entry)
-                } else {
-                    userAllergensService.removeUserAllergenEntry(userId, allergenId)
-                    call.respond(HttpStatusCode.NoContent)
+                try {
+                    userAllergensService.addUserAllergenEntry(userId, request.allergenId)
+                    val allergens = userAllergensService.getUserAllergenEntries(userId)
+                    call.respond(HttpStatusCode.Created, allergens)
+                } catch (e: Exception) {
+                    val allergens = userAllergensService.getUserAllergenEntries(userId)
+                    call.respond(HttpStatusCode.Conflict, allergens)
                 }
+            }
+
+            // DELETE /allergens/remove-allergen
+            delete("/remove-allergen") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
+
+                val request = call.receive<AllergenIDRequest>()
+
+                userAllergensService.removeUserAllergenEntry(userId, request.allergenId)
+
+                val allergens = userAllergensService.getUserAllergenEntries(userId)
+                call.respond(HttpStatusCode.OK, allergens)
             }
         }
     }
