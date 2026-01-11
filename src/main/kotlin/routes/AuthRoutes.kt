@@ -26,7 +26,10 @@ import kotlin.getValue
 
 
 
-fun Route.signUp(){
+fun Route.signUp(
+    tokenService: JwtService,
+    tokenConfig : TokenConfig
+){
     val userService by inject<UserService>()
     post("/signup"){
         val request = call.receiveNullable<AuthRequest>() ?: kotlin.run{
@@ -45,14 +48,24 @@ fun Route.signUp(){
             call.respond(HttpStatusCode.Conflict, "User already exists")
         }
 
-        val user = UserEntry(
+        val userEntry = UserEntry(
             name = request.username,
             password = request.password,
             email = request.email,
         )
-        userService.create(user)
+        val user = userService.create(userEntry)
 
-        call.respond(HttpStatusCode.OK)
+        val token = tokenService.generate(
+            config = tokenConfig,
+            TokenClaim(
+                name = "userId",
+                value = user.email
+            ),
+            TokenClaim(name = "userName",
+                value = user.name)
+        )
+
+        call.respond(HttpStatusCode.OK, AuthResponse(token = token))
 
     }
 }

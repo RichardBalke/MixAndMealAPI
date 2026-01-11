@@ -35,7 +35,7 @@ fun Application.configureRouting(
         recipeCardsByDifficulty()
         quickRecipes()
         userFridgeRoutes()
-        signUp()
+        signUp(tokenService, tokenConfig)
         signIn(tokenService, tokenConfig)
         authenticated()
         getSecretInfo()
