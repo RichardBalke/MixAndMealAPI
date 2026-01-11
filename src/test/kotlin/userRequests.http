@@ -128,16 +128,22 @@ GET http://127.0.0.1:8080/allergens
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-### post add or remove allergen for signed in user
-POST http://127.0.0.1:8080/allergens/add-remove-allergen
+### post add allergen for signed in user
+POST http://127.0.0.1:8080/allergens/add-allergen
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "id": 1,
-  "name": "GLUTEN",
-  "displayName": "Glutenbevattende granen",
-  "description": "Bevat gluten uit tarwe, rogge, gerst, haver, spelt of kamut"
+  "allergenId": 1
+}
+
+### post remove allergen for signed in user
+DELETE http://127.0.0.1:8080/allergens/remove-allergen
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "allergenId": 1
 }
 
 ###
