@@ -27,11 +27,12 @@ fun Route.userFridgeRoutes() {
                 call.respond(HttpStatusCode.OK ,fridge)
             }
 
-            post("/ingredient") {
+            post("/add-ingredient-to-fridge") {
                 val principal = call.principal<JWTPrincipal>()
                 val userId = principal?.getClaim("userId", String::class)!!
 
                 val ingredient = call.receive<IngredientIDRequest>()
+                println(ingredient)
                 try {
                     val entry = userFridgeService.addUserFridgeEntry(
                         UserFridgeEntry(userId = userId, ingredientName = ingredient.ingredientName)
@@ -42,7 +43,7 @@ fun Route.userFridgeRoutes() {
                 }
             }
 
-            delete("/ingredient") {
+            delete("/remove-ingredient-from-fridge") {
                 val principal = call.principal<JWTPrincipal>()
                 val userId = principal?.getClaim("userId", String::class)!!
 

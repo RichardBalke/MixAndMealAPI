@@ -1,5 +1,5 @@
 #Replace token with new token
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzY1NzE4NTY3LCJ1c2VySWQiOiJhbGljZUBleGFtcGxlLmNvbSJ9.LwV-fa-qr2WHHgrZwzFVFUPu9My6j9tJRa3NeVX3_iw
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzY4MjE4NzAzLCJ1c2VySWQiOiJhbGljZUBleGFtcGxlLmNvbSIsInVzZXJOYW1lIjoiQWxpY2UgSm9obnNvbiJ9.Ztx4jHgWPFFlU-xJOGACjJADnWhgIe-_wJ2qW_ZmoJw
 @token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1c2VycyIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwiZXhwIjoxNzYxMzk4NjY4LCJ1c2VySWQiOiIyIn0.0Js7xIPcglS40m_s6lRpE1hDSXC5_jW9kGiAqNXlQ4A
 
 ### get all users
@@ -141,12 +141,38 @@ Authorization: Bearer {{token}}
 }
 
 ###
-GET http://127.0.0.1:8080/fridge/alice@example.com
-
+GET http://127.0.0.1:8080/fridge
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 ###
-POST http://127.0.0.1:8080/fridge/alice@example.com
+POST http://127.0.0.1:8080/fridge/add-ingredient-to-fridge
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-    "ingredientName": "Tomato"
+  "ingredientName": "Broccoli"
+}
+
+###
+DELETE http://127.0.0.1:8080/fridge/remove-ingredient-from-fridge
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "ingredientName": "Broccoli"
+}
+
+###
+GET http://127.0.0.1:8080/favourites
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+POST http://127.0.0.1:8080/favourites/add-remove-favourite-recipe
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "recipeId": 2
 }
