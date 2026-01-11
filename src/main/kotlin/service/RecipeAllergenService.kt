@@ -1,6 +1,7 @@
 package service
 
 import models.dto.AllergenEntry
+import models.dto.RecipeAllergenEntry
 import models.dto.RecipeEntry
 import repository.RecipeAllergensRepositoryImpl
 
@@ -27,5 +28,11 @@ class RecipeAllergenService(val recipeAllergensRepository: RecipeAllergensReposi
             }
         }
         return recipes
+    }
+
+    suspend fun addRecipeAllergen(
+        recipeAllergen: RecipeAllergenEntry
+    ){
+        recipeAllergensRepository.create(recipeAllergen)
     }
 }

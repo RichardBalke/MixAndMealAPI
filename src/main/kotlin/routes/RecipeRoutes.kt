@@ -2,6 +2,7 @@ package api.routes
 
 import api.repository.IngredientUnitRepositoryImpl
 import api.repository.RecipesRepositoryImpl
+import api.requests.RecipeUploadRequest
 import api.responses.RecipeCardResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
@@ -225,5 +226,33 @@ fun Route.recipesRoutes() {
             }
         }
 
+    }
+}
+
+
+fun Route.uploadRecipe() {
+    val recipeService by inject<RecipeService>()
+    val recipeImagesService by inject<RecipeImagesService>()
+    val recipeDietsService by inject<RecipeDietsService>()
+    val recipeAllergenService by inject<RecipeAllergenService>()
+    val ingredientUnitService by inject<IngredientUnitService>()
+
+    authenticate { route("/upload-recipe"){
+        post(){
+            if (call.requireAdmin()) {
+                val newRecipe = call.receive<RecipeUploadRequest>()
+                recipeService.createUploadedRecipe(
+                    newRecipe,
+                    recipeImagesService,
+                    recipeDietsService,
+                    recipeAllergenService,
+                    ingredientUnitService
+                )
+                call.respond(HttpStatusCode.Created, "Hooray")
+            } else {
+                call.respond(HttpStatusCode.Unauthorized)
+            }
+        }
+    }
     }
 }

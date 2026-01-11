@@ -7,4 +7,10 @@ class IngredientUnitService(private val ingredientUnitRepository: IngredientUnit
     suspend fun getIngredientsByRecipeId(id : Int): List<IngredientUnitEntry>{
         return ingredientUnitRepository.findAllByRecipeId(id)
     }
+
+    suspend fun addIngredientUnit(
+        ingredientUnit: IngredientUnitEntry
+    ){
+        ingredientUnitRepository.create(ingredientUnit)
+    }
 }

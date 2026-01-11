@@ -2,6 +2,8 @@ package service
 
 
 import models.dto.DietEntry
+import models.dto.RecipeDietEntry
+import models.tables.RecipeDiets
 import repository.RecipeDietsRepositoryImpl
 
 class RecipeDietsService(private val recipeDietsRepository: RecipeDietsRepositoryImpl) {
@@ -15,5 +17,10 @@ class RecipeDietsService(private val recipeDietsRepository: RecipeDietsRepositor
             }
         }
         return diets
+    }
+    suspend fun addRecipeDiet(
+        recipeDiets: RecipeDietEntry
+    ){
+        recipeDietsRepository.create(recipeDiets)
     }
 }

@@ -2,7 +2,11 @@ package service
 
 import api.repository.RecipesRepository
 import api.repository.RecipesRepositoryImpl
+import api.requests.RecipeUploadRequest
 import api.responses.RecipeCardResponse
+import models.dto.IngredientUnitEntry
+import models.dto.RecipeAllergenEntry
+import models.dto.RecipeDietEntry
 import models.dto.RecipeEntry
 import models.dto.UserFavouritesEntry
 import models.tables.Recipes
@@ -37,8 +41,8 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
         return recipeRepository.findAll()
     }
 
-    suspend fun addRecipes(recipe: RecipeEntry) {
-        recipeRepository.create(recipe)
+    suspend fun addRecipes(recipe: RecipeEntry): RecipeEntry {
+        return recipeRepository.create(recipe)
     }
 
     suspend fun getRecipe(id: Int): RecipeEntry? {
@@ -94,6 +98,58 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
             recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
         }
         return recipes
+    }
+
+    suspend fun createUploadedRecipe(
+        uploadedRecipe: RecipeUploadRequest,
+        recipeImagesService: RecipeImagesService,
+        recipeDietsService: RecipeDietsService,
+        recipeAllergenService: RecipeAllergenService,
+        ingredientUnitService: IngredientUnitService,
+
+    ) {
+        val recipe = RecipeEntry(
+            0,
+            uploadedRecipe.title,
+            uploadedRecipe.description,
+            uploadedRecipe.instructions,
+            uploadedRecipe.prepTime,
+            uploadedRecipe.cookingTime,
+            uploadedRecipe.difficulty,
+            uploadedRecipe.mealType,
+            uploadedRecipe.kitchenStyle,
+            0
+        )
+
+        val recipeImage = uploadedRecipe.images
+        val recipeDiets = uploadedRecipe.diets
+        val recipeAllergens = uploadedRecipe.allergens
+        val recipeIngredients = uploadedRecipe.ingredients
+
+        val newRecipe = addRecipes(recipe)
+
+
+        for (image in recipeImage) {
+            recipeImagesService.addImage(
+                newRecipe.id,
+                image.imageUrl
+            )
+        }
+
+        for (diets in recipeDiets) {
+            val newRecipeDiet = RecipeDietEntry(newRecipe.id, diets.id)
+            recipeDietsService.addRecipeDiet(newRecipeDiet)
+        }
+
+        for (allergens in recipeAllergens) {
+            val newRecipeAllergen = RecipeAllergenEntry(newRecipe.id, allergens.id)
+            recipeAllergenService.addRecipeAllergen(newRecipeAllergen)
+        }
+
+        for (ingredient in recipeIngredients) {
+            val newIngredientUnit = IngredientUnitEntry(newRecipe.id, ingredient.ingredientName, ingredient.amount,ingredient.unitType)
+            ingredientUnitService.addIngredientUnit(newIngredientUnit)
+        }
     }
 
 }
