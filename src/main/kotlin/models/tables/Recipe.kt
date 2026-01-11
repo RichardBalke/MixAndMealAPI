@@ -13,4 +13,6 @@ object Recipes : Table() {
     val mealType = varchar("mealtype", 255)
     val kitchenStyle = varchar("kitchenstyle", 255)
     val favoritesCount = integer("favoritescount")
+
+    override val primaryKey = PrimaryKey(id)
 }

@@ -16,4 +16,10 @@ class UserAllergensService(private val userAllergensRepository: UserAllergensRep
     suspend fun removeUserAllergenEntry(userId: String, allergenId: Int) {
         userAllergensRepository.removeAllergen(userId, allergenId)
     }
+
+    suspend fun checkAllergenExists(userId: String, allergenId: Int): Boolean {
+        val userAllergen = userAllergensRepository.getAllergensForUser(userId)
+            .filter { it.allergenId == allergenId }
+        return userAllergen.isNotEmpty()
+    }
 }

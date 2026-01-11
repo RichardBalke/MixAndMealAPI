@@ -5,6 +5,7 @@ import api.repository.CrudImplementation
 import api.repository.CrudRepository
 import models.tables.UserAllergens
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 interface UserAllergensRepository : CrudRepository<UserAllergenEntry, UserAllergenEntry> {
@@ -33,7 +34,8 @@ class UserAllergensRepositoryImpl :
 
     override suspend fun getAllergensForUser(userId: String): List<UserAllergenEntry> = transaction {
         UserAllergens
-            .select(UserAllergens.userId eq userId)
+            .selectAll()
+            .where(UserAllergens.userId eq userId)
             .map(toEntity)
             .toList()
     }
