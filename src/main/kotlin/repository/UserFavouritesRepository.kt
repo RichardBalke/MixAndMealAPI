@@ -53,8 +53,8 @@ class UserFavouritesRepositoryImpl :
 
     override suspend fun checkFavouriteExists(userId: String, recipeId: Int): List<UserFavouritesEntry> = transaction {
         UserFavourites.selectAll()
-            .where(UserFavourites.userId eq userId)
-            .where(UserFavourites.recipeId eq recipeId)
+            .where((UserFavourites.userId eq userId) and (UserFavourites.recipeId eq recipeId))
             .map(toEntity)
+        .toList()
     }
 }
