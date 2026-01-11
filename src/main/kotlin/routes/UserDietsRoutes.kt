@@ -1,5 +1,6 @@
 package routes
 
+import api.responses.RecipeCardResponse
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.request.*
@@ -8,45 +9,59 @@ import service.UserDietsService
 import models.dto.UserDietEntry
 import io.ktor.server.routing.Route
 import io.ktor.http.*
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
+import models.dto.DietEntry
+import org.koin.ktor.ext.inject
+import service.DietsService
 
-fun Route.userDietsRoutes(userDietsService: UserDietsService) {
+fun Route.userDietsRoutes() {
+    val userDietsService by inject<UserDietsService>()
+    val dietsService by inject<DietsService>()
 
-    route("/diets") {
+    authenticate {
+        route("/user-diets") {
+            get() {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
 
-        get("/{userId}") {
-            val userId = call.parameters["userId"] ?: return@get call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val diets: List<UserDietEntry> = userDietsService.getUserDietEntries(userId)
-            call.respond(diets)
-        }
+                val userDiets: List<UserDietEntry> = userDietsService.getUserDietEntries(userId)
 
-        post("/{userId}/diet") {
-            val userId = call.parameters["userId"] ?: return@post call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val dietId = call.receive<Map<String, Int>>()["dietId"]
-                ?: return@post call.respondText("Missing dietId", status = HttpStatusCode.BadRequest)
+                val diets = mutableListOf<DietEntry>()
 
-            try {
-                val entry = userDietsService.addUserDietEntry(
-                    UserDietEntry(userId = userId, dietId = dietId)
-                )
-                call.respond(HttpStatusCode.Created, entry)
-            } catch (e: IllegalArgumentException) {
-                call.respond(HttpStatusCode.Conflict, e.message ?: "Diet already exists")
+                if (userDiets.isNotEmpty()) {
+                    diets.addAll(userDietsService.getDietsFromEntries(userDiets, dietsService))
+                }
+
+                call.respond(HttpStatusCode.OK, diets)
             }
-        }
 
-        delete("/{userId}/diet") {
-            val userId = call.parameters["userId"] ?: return@delete call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val dietId = call.receive<Map<String, Int>>()["dietId"]
-                ?: return@delete call.respondText("Missing dietId", status = HttpStatusCode.BadRequest)
+            post("/add-diet") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
 
-            userDietsService.removeUserDietEntry(userId, dietId)
-            call.respond(HttpStatusCode.NoContent)
+                val dietId = call.receive<DietEntry>()
+
+                try {
+                    val entry = userDietsService.addUserDietEntry(
+                        UserDietEntry(userId = userId, dietId = dietId.id)
+                    )
+                    call.respond(HttpStatusCode.Created, entry)
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.Conflict, e.message ?: "Diet already exists")
+                }
+            }
+
+            delete("/remove-diet") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
+
+                val dietId = call.receive<DietEntry>()
+
+                userDietsService.removeUserDietEntry(userId, dietId.id)
+                call.respond(HttpStatusCode.NoContent)
+            }
         }
     }
 }

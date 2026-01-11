@@ -1,5 +1,6 @@
 package service
 
+import models.dto.DietEntry
 import models.dto.UserDietEntry
 import repository.UserDietsRepository
 
@@ -15,5 +16,16 @@ class UserDietsService(private val userDietsRepository: UserDietsRepository) {
 
     suspend fun removeUserDietEntry(userId: String, dietId: Int) {
         userDietsRepository.removeDiet(userId, dietId)
+    }
+
+    suspend fun getDietsFromEntries(entries: List<UserDietEntry>, dietsService: DietsService): List<DietEntry> {
+        val result = mutableListOf<DietEntry>()
+        for (entry in entries) {
+            val diet = dietsService.getDietById(entry.dietId)
+            if (diet != null) {
+                result.add(diet)
+            }
+        }
+        return result
     }
 }

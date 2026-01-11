@@ -1,5 +1,6 @@
 package api.routes
 
+import api.requests.IngredientIDRequest
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.request.*
@@ -9,52 +10,48 @@ import models.dto.UserFridgeEntry
 import io.ktor.server.routing.Route
 import io.ktor.http.*
 import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.principal
 import org.koin.ktor.ext.inject
 
 fun Route.userFridgeRoutes() {
     val userFridgeService by inject<UserFridgeService>()
-//    authenticate {
+    authenticate {
         route("/fridge") {
+            get() {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
 
-
-            get("/{userId}") {
-                val userId = call.parameters["userId"] ?: return@get call.respondText(
-                    "Missing userId", status = HttpStatusCode.BadRequest
-                )
                 val fridge: List<UserFridgeEntry> = userFridgeService.getUserFridgeEntries(userId)
-                if (fridge.isEmpty()) call.respondText("Not found", status = HttpStatusCode.Conflict)
-                call.respond(fridge)
 
+                call.respond(HttpStatusCode.OK ,fridge)
+            }
 
-                post("/ingredient") {
-                    val userId = call.parameters["userId"] ?: return@post call.respondText(
-                        "Missing userId", status = HttpStatusCode.BadRequest
+            post("/ingredient") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
+
+                val ingredient = call.receive<IngredientIDRequest>()
+                try {
+                    val entry = userFridgeService.addUserFridgeEntry(
+                        UserFridgeEntry(userId = userId, ingredientName = ingredient.ingredientName)
                     )
-                    val ingredient = call.receive<Map<String, String>>()["ingredientName"]
-                        ?: return@post call.respondText("Missing ingredientName", status = HttpStatusCode.BadRequest)
-
-                    try {
-                        val entry = userFridgeService.addUserFridgeEntry(
-                            UserFridgeEntry(userId = userId, ingredientName = ingredient)
-                        )
-                        call.respond(HttpStatusCode.Created, entry)
-                    } catch (e: IllegalArgumentException) {
-                        call.respond(HttpStatusCode.Conflict, e.message ?: "Ingredient already exists")
-                    }
+                    call.respond(HttpStatusCode.Created, entry)
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.Conflict, e.message ?: "Ingredient already exists")
                 }
             }
-        }
 
-        delete("/{userId}/ingredient") {
-            val userId = call.parameters["userId"] ?: return@delete call.respondText(
-                "Missing userId", status = HttpStatusCode.BadRequest
-            )
-            val ingredient = call.receive<Map<String, String>>()["ingredientName"]
-                ?: return@delete call.respondText("Missing ingredientName", status = HttpStatusCode.BadRequest)
+            delete("/ingredient") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.getClaim("userId", String::class)!!
 
-            userFridgeService.removeUserFridgeEntry(userId, ingredient)
-            call.respond(HttpStatusCode.NoContent)
+                val ingredient = call.receive<IngredientIDRequest>()
+
+                userFridgeService.removeUserFridgeEntry(userId, ingredient.ingredientName)
+                call.respond(HttpStatusCode.NoContent)
+            }
         }
-//    }
+    }
 
 }

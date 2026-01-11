@@ -10,13 +10,14 @@ import api.routes.userRoutes
 import api.routes.recipesRoutes
 import api.routes.userFridgeRoutes
 import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import models.dto.TokenConfig
 import routes.authenticated
 import routes.getSecretInfo
 import routes.signIn
 import routes.signUp
+import routes.userDietsRoutes
+import routes.userFavouritesRoutes
 import service.JwtService
 
 fun Application.configureRouting(
@@ -37,5 +38,7 @@ fun Application.configureRouting(
         signIn(tokenService, tokenConfig)
         authenticated()
         getSecretInfo()
+        userDietsRoutes()
+        userFavouritesRoutes()
     }
 }
