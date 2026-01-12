@@ -13,6 +13,7 @@ import models.tables.Recipes
 import org.koin.java.KoinJavaComponent.inject
 import repository.RecipeAllergensRepositoryImpl
 import requests.RecipeSearchRequest
+import kotlin.String
 
 class RecipeService(private val recipeRepository : RecipesRepository) {
     fun formatCookingTime(minutes: Int): String {
@@ -21,12 +22,25 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
         return "${hours}h ${minutes}m"
     }
 
-//    suspend fun searchRecipes() {
-//        val rawRecipes = recipeRepository.searchRecipesRaw()
-//        rawRecipes.filter{
-//
-//        }
-//    }
+    suspend fun searchRecipes(recipeSearchRequest: RecipeSearchRequest, recipeImagesService: RecipeImagesService) : List<RecipeCardResponse> {
+        val rawRecipes = recipeRepository.searchRecipesRaw()
+        rawRecipes.filter{
+            (recipeSearchRequest.partialTitle == null || it.title.contains(recipeSearchRequest.partialTitle))
+            (recipeSearchRequest.difficulty == null || it.difficulty == recipeSearchRequest.difficulty.uppercase())
+            (recipeSearchRequest.mealType == null || recipeSearchRequest.mealType == it.mealType)
+            (recipeSearchRequest.kitchenStyle == null || it.kitchenStyle == recipeSearchRequest.kitchenStyle)
+            (recipeSearchRequest.maxCookingTime == null || it.cookingTime <= recipeSearchRequest.maxCookingTime)
+            (recipeSearchRequest.diets.isEmpty() || recipeSearchRequest.diets.contains(it.dietId))
+            (recipeSearchRequest.allergens.isEmpty() || recipeSearchRequest.allergens.contains(it.allergenId))
+            (recipeSearchRequest.ingredients.isEmpty() || recipeSearchRequest.ingredients.contains(it.ingredientName))
+        }.toSet()
+
+        val recipes = recipeRepository.findRecipesFromRawRecipes(rawRecipes)
+        for (recipe in recipes) {
+            recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
+        }
+        return recipes
+    }
 
     suspend fun getAllRecipes(): List<RecipeCardResponse> {
         return recipeRepository.findAllRecipesAsRecipeCards()

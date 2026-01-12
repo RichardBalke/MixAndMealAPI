@@ -32,6 +32,7 @@ interface RecipesRepository : CrudRepository<RecipeEntry, Int>{
     suspend fun findFavoriteRecipes(recipeIds: List<UserFavouritesEntry>): List<RecipeCardResponse>
     suspend fun findAllRecipesAsRecipeCards(): List<RecipeCardResponse>
     suspend fun searchRecipesRaw() : List<RawSearchRecipes>
+    suspend fun findRecipesFromRawRecipes(recipeIds: List<RawSearchRecipes>): List<RecipeCardResponse>
 }
 
 
@@ -212,5 +213,26 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
                     ingredientName = it[IngredientUnits.ingredientName]
                 )
             }
+    }
+
+    override suspend fun findRecipesFromRawRecipes(recipeIds: List<RawSearchRecipes>): List<RecipeCardResponse> {
+        val list = mutableListOf<RecipeCardResponse>()
+        for (recipeId in recipeIds) {
+            transaction {
+                list.addAll(table.select(Recipes.id, Recipes.title, Recipes.description, Recipes.cookingTime)
+                    .where(Recipes.id eq recipeId.recipeId)
+                    .map {
+                        RecipeCardResponse(
+                            recipeId = it[Recipes.id],
+                            it[Recipes.title],
+                            it[Recipes.description],
+                            it[Recipes.cookingTime],
+                            mutableListOf()
+                        )
+                    }
+                    .toList())
+            }
+        }
+        return list
     }
 }
