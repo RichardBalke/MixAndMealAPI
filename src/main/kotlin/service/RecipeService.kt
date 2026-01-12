@@ -21,21 +21,12 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
         return "${hours}h ${minutes}m"
     }
 
-    suspend fun searchRecipes(request: RecipeSearchRequest): List<RecipeEntry> {
-        val recipes = mutableSetOf<RecipeEntry>()
-        if(request.partialTitle == "" &&
-            request.difficulty == "" &&
-            request.mealType == "" &&
-            request.kitchenStyle == "" &&
-            request.maxCookingTime != 0 &&
-            request.diets.isEmpty() &&
-            request.allergens.isEmpty() &&
-            request.ingredients.isEmpty()){
-        }
-
-
-        return recipes.toList()
-    }
+//    suspend fun searchRecipes() {
+//        val rawRecipes = recipeRepository.searchRecipesRaw()
+//        rawRecipes.filter{
+//
+//        }
+//    }
 
     suspend fun getAllRecipes(): List<RecipeCardResponse> {
         return recipeRepository.findAllRecipesAsRecipeCards()
