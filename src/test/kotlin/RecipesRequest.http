@@ -6,12 +6,12 @@ GET http://127.0.0.1:8080/fullrecipe/1
 ### Get quick recipes
 GET http://127.0.0.1:8080/quick-recipes/5
 
-### Create a new recipe
-POST http://localhost:8080/search-recipes
+###
+GET http://localhost:8080/search-recipes
 Content-Type: application/json
 
 {
-  "partialTitle": null,
+  "partialTitle": "pasta",
   "difficulty": null,
   "mealType": null,
   "kitchenStyle": null,
@@ -20,7 +20,6 @@ Content-Type: application/json
   "allergens": [],
   "ingredients": []
 }
-
 
 ### Get all recipes
 GET http://localhost:8080/recipes

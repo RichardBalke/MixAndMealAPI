@@ -15,7 +15,6 @@ import models.tables.RecipeAllergens
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
-import org.jetbrains.exposed.sql.leftJoin
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -192,10 +191,7 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
     }
 
     override suspend fun searchRecipesRaw() : List<RawSearchRecipes> = transaction {
-        Recipes
-            .leftJoin(RecipeDiets, { Recipes.id eq RecipeDiets.recipeId } )
-            .leftJoin(RecipeAllergens, { Recipes.id eq RecipeAllergens.recipeId } )
-            .leftJoin(IngredientUnits, { Recipes.id eq IngredientUnits.recipeId } )
+        (Recipes innerJoin RecipeDiets innerJoin RecipeAllergens innerJoin IngredientUnits)
             .selectAll()
             .map{
                 RawSearchRecipes(
