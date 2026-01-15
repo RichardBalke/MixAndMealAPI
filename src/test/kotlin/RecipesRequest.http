@@ -11,7 +11,7 @@ GET http://localhost:8080/search-recipes
 Content-Type: application/json
 
 {
-  "partialTitle": "pasta",
+  "partialTitle": "Vegetable Stir Fry",
   "difficulty": null,
   "mealType": null,
   "kitchenStyle": null,

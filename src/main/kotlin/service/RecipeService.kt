@@ -22,24 +22,8 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
         return "${hours}h ${minutes}m"
     }
 
-    suspend fun searchRecipes(recipeSearchRequest: RecipeSearchRequest, recipeImagesService: RecipeImagesService) : Set<RecipeCardResponse> {
-        val rawRecipes = recipeRepository.searchRecipesRaw().toSet()
-        rawRecipes.filter{
-            (recipeSearchRequest.partialTitle == null || it.title.contains(recipeSearchRequest.partialTitle))
-            (recipeSearchRequest.difficulty == null || it.difficulty == recipeSearchRequest.difficulty.uppercase())
-            (recipeSearchRequest.mealType == null || recipeSearchRequest.mealType == it.mealType)
-            (recipeSearchRequest.kitchenStyle == null || it.kitchenStyle == recipeSearchRequest.kitchenStyle)
-            (recipeSearchRequest.maxCookingTime == null || it.cookingTime <= recipeSearchRequest.maxCookingTime)
-            (recipeSearchRequest.diets.isEmpty() || recipeSearchRequest.diets.contains(it.dietId))
-            (recipeSearchRequest.allergens.isEmpty() || recipeSearchRequest.allergens.contains(it.allergenId))
-            (recipeSearchRequest.ingredients.isEmpty() || recipeSearchRequest.ingredients.contains(it.ingredientName))
-        }.toSet()
-
-        val recipes = recipeRepository.findRecipesFromRawRecipes(rawRecipes.toList())
-        for (recipe in recipes) {
-            recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
-        }
-        return recipes.toSet()
+    suspend fun searchRecipes(recipeSearchRequest: RecipeSearchRequest) : List<RecipeCardResponse> {
+        return recipeRepository.searchRecipes(recipeSearchRequest).toList()
     }
 
     suspend fun getAllRecipes(): List<RecipeCardResponse> {
