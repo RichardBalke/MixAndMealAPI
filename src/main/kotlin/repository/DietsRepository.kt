@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 interface DietsRepository : CrudRepository<DietEntry, Int> {
     suspend fun findByDietId(dietId: Int) : DietEntry
+    suspend fun findByDisplayName(displayName: String): DietEntry?
 }
 
 class DietsRepositoryImpl() : DietsRepository, CrudImplementation<DietEntry, Int>(
@@ -30,5 +31,10 @@ class DietsRepositoryImpl() : DietsRepository, CrudImplementation<DietEntry, Int
             .where(Diets.id eq dietId)
             .map(toEntity)
             .single()
+    }
+
+    override suspend fun findByDisplayName(displayName: String): DietEntry? = transaction {
+        table.selectAll()
+            .where(Diets.displayName eq displayName).firstNotNullOfOrNull(toEntity)
     }
 }

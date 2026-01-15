@@ -13,10 +13,12 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import jdk.internal.vm.ScopedValueContainer.call
 import models.dto.IngredientEntry
 import models.dto.RecipeEntry
 import org.koin.ktor.ext.inject
+import repository.AllergensRepository
+import api.responses.RecipeResponse
+import repository.DietsRepository
 import requests.RecipeSearchRequest
 import responses.FullRecipeScreenResponse
 import service.AllergenService
@@ -151,6 +153,9 @@ fun Route.quickRecipes(){
 fun Route.recipesRoutes() {
     val recipeService by inject<RecipeService>()
     val recipeImagesService by inject<RecipeImagesService>()
+    val recipeDietsService by inject<RecipeDietsService>()
+    val recipeAllergenService by inject<RecipeAllergenService>()
+    val ingredientUnitService by inject<IngredientUnitService>()
     route("/recipes") {
 
         // Get all recipes
@@ -158,17 +163,6 @@ fun Route.recipesRoutes() {
             val recipes = recipeService.getAllRecipes()
 
             call.respond(HttpStatusCode.OK, recipes)
-        }
-
-        post {
-            if (call.requireAdmin()) {
-                val request = call.receive<RecipeEntry>()
-                val created = recipeService.addRecipes(request)
-                call.respond(HttpStatusCode.Created, created)
-            } else {
-                call.respond(HttpStatusCode.Unauthorized)
-            }
-
         }
 
 
@@ -197,7 +191,19 @@ fun Route.recipesRoutes() {
             call.respond(HttpStatusCode.OK, recipe)
         }
 
-        authenticate {
+//        authenticate {
+            post {
+                val newRecipe = call.receive<RecipeUploadRequest>()
+                val id = recipeService.createUploadedRecipe(
+                    newRecipe,
+                    recipeImagesService,
+                    recipeDietsService,
+                    recipeAllergenService,
+                    ingredientUnitService
+                )
+                call.respond(HttpStatusCode.Created, RecipeResponse(id))
+            }
+
             delete("/{id}") {
                 if (call.requireAdmin()) {
                     // controleert of de parameter {id} in de url naar een Long type geconvert kan worden.
@@ -227,7 +233,7 @@ fun Route.recipesRoutes() {
                     call.respond(HttpStatusCode.NotFound)
                 }
             }
-        }
+//        }
 
     }
 }
@@ -240,22 +246,19 @@ fun Route.uploadRecipe() {
     val recipeAllergenService by inject<RecipeAllergenService>()
     val ingredientUnitService by inject<IngredientUnitService>()
 
-    authenticate { route("/upload-recipe"){
-        post(){
-            if (call.requireAdmin()) {
+//    authenticate {
+        route("/upload-recipe") {
+            post {
                 val newRecipe = call.receive<RecipeUploadRequest>()
-                recipeService.createUploadedRecipe(
+                val id = recipeService.createUploadedRecipe(
                     newRecipe,
                     recipeImagesService,
                     recipeDietsService,
                     recipeAllergenService,
                     ingredientUnitService
                 )
-                call.respond(HttpStatusCode.Created, "Hooray")
-            } else {
-                call.respond(HttpStatusCode.Unauthorized)
+                call.respond(HttpStatusCode.Created, RecipeResponse(id))
             }
         }
-    }
-    }
+//    }
 }

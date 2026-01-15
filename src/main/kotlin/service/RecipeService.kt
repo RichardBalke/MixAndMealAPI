@@ -10,28 +10,88 @@ import models.dto.RecipeDietEntry
 import models.dto.RecipeEntry
 import models.dto.UserFavouritesEntry
 import models.tables.Recipes
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.koin.java.KoinJavaComponent.inject
+import repository.AllergensRepository
+import repository.DietsRepository
 import repository.RecipeAllergensRepositoryImpl
 import requests.RecipeSearchRequest
 import kotlin.String
 
-class RecipeService(private val recipeRepository : RecipesRepository) {
+class RecipeService(
+    private val recipeRepository : RecipesRepository,
+    private val dietsRepository: DietsRepository,
+    private val allergensRepository: AllergensRepository
+) {
+
+    suspend fun createUploadedRecipe(
+        uploadedRecipe: RecipeUploadRequest,
+        recipeImagesService: RecipeImagesService,
+        recipeDietsService: RecipeDietsService,
+        recipeAllergenService: RecipeAllergenService,
+        ingredientUnitService: IngredientUnitService
+    ): Int {
+        return newSuspendedTransaction {
+            val recipe = RecipeEntry(
+                0,
+                uploadedRecipe.title,
+                uploadedRecipe.description,
+                uploadedRecipe.instructions,
+                uploadedRecipe.prepTime,
+                uploadedRecipe.cookingTime,
+                uploadedRecipe.difficulty,
+                uploadedRecipe.mealType,
+                uploadedRecipe.kitchenStyle,
+                0
+            )
+            val newRecipe = recipeRepository.create(recipe)  // Changed from addRecipes
+
+            // All service calls NOW work because they're inside transaction block
+            uploadedRecipe.images.forEach { image ->
+                recipeImagesService.addImage(newRecipe.id, image.imageUrl)
+            }
+
+            uploadedRecipe.diets.forEach { dietRequest ->
+                dietsRepository.findByDisplayName(dietRequest.displayName)?.let { diet ->
+                    recipeDietsService.addRecipeDiet(RecipeDietEntry(newRecipe.id, diet.id))
+                }
+            }
+
+            uploadedRecipe.allergens.forEach { allergenRequest ->
+                allergensRepository.findByDisplayName(allergenRequest.displayName)?.let { allergen ->
+                    recipeAllergenService.addRecipeAllergen(RecipeAllergenEntry(newRecipe.id, allergen.id))
+                }
+            }
+
+            uploadedRecipe.ingredients.forEach { ingredient ->
+                ingredientUnitService.addIngredientUnit(
+                    IngredientUnitEntry(newRecipe.id, ingredient.ingredientName, ingredient.amount, ingredient.unitType)
+                )
+            }
+            newRecipe.id
+        }
+    }
+
+
     fun formatCookingTime(minutes: Int): String {
         val hours = minutes / 60
         val minutes = minutes % 60
         return "${hours}h ${minutes}m"
     }
 
-    suspend fun searchRecipes(recipeSearchRequest: RecipeSearchRequest, recipeImagesService: RecipeImagesService) : List<RecipeCardResponse> {
+    suspend fun searchRecipes(
+        recipeSearchRequest: RecipeSearchRequest,
+        recipeImagesService: RecipeImagesService
+    ): List<RecipeCardResponse> {
         val rawRecipes = recipeRepository.searchRecipesRaw()
-        rawRecipes.filter{
-            (recipeSearchRequest.partialTitle == null || it.title.contains(recipeSearchRequest.partialTitle))
-            (recipeSearchRequest.difficulty == null || it.difficulty == recipeSearchRequest.difficulty.uppercase())
-            (recipeSearchRequest.mealType == null || recipeSearchRequest.mealType == it.mealType)
-            (recipeSearchRequest.kitchenStyle == null || it.kitchenStyle == recipeSearchRequest.kitchenStyle)
-            (recipeSearchRequest.maxCookingTime == null || it.cookingTime <= recipeSearchRequest.maxCookingTime)
-            (recipeSearchRequest.diets.isEmpty() || recipeSearchRequest.diets.contains(it.dietId))
-            (recipeSearchRequest.allergens.isEmpty() || recipeSearchRequest.allergens.contains(it.allergenId))
+        rawRecipes.filter {
+            (recipeSearchRequest.partialTitle == null || it.title.contains(recipeSearchRequest.partialTitle)) &&
+            (recipeSearchRequest.difficulty == null || it.difficulty == recipeSearchRequest.difficulty.uppercase()) &&
+            (recipeSearchRequest.mealType == null || recipeSearchRequest.mealType == it.mealType) &&
+            (recipeSearchRequest.kitchenStyle == null || it.kitchenStyle == recipeSearchRequest.kitchenStyle) &&
+            (recipeSearchRequest.maxCookingTime == null || it.cookingTime <= recipeSearchRequest.maxCookingTime) &&
+            (recipeSearchRequest.diets.isEmpty() || recipeSearchRequest.diets.contains(it.dietId)) &&
+            (recipeSearchRequest.allergens.isEmpty() || recipeSearchRequest.allergens.contains(it.allergenId)) &&
             (recipeSearchRequest.ingredients.isEmpty() || recipeSearchRequest.ingredients.contains(it.ingredientName))
         }.toSet()
 
@@ -54,107 +114,66 @@ class RecipeService(private val recipeRepository : RecipesRepository) {
         return recipeRepository.findByRecipeId(id)
     }
 
-    suspend fun deleteRecipe(id: Int) : Boolean {
+    suspend fun deleteRecipe(id: Int): Boolean {
         return recipeRepository.delete(id)
     }
 
-    suspend fun findByTitle(title: String): List<RecipeEntry>{
+    suspend fun findByTitle(title: String): List<RecipeEntry> {
         return recipeRepository.findByTitle(title)
     }
-    suspend fun findByDifficulty(difficulty: String): List<RecipeEntry>{
+
+    suspend fun findByDifficulty(difficulty: String): List<RecipeEntry> {
         return recipeRepository.findByDifficulty(difficulty)
     }
-    suspend fun findByMealType(mealType: String): List<RecipeEntry>{
+
+    suspend fun findByMealType(mealType: String): List<RecipeEntry> {
         return recipeRepository.findByMealType(mealType)
     }
-    suspend fun findByDiets(diets: String): List<RecipeEntry>{
+
+    suspend fun findByDiets(diets: String): List<RecipeEntry> {
         return recipeRepository.findByDiets(diets)
     }
-    suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry>{
+
+    suspend fun findByKitchenStyle(kitchenStyle: String): List<RecipeEntry> {
         return recipeRepository.findByKitchenStyle(kitchenStyle)
     }
 
     suspend fun findPopularRecipes(limit: Int, recipeImagesService: RecipeImagesService): List<RecipeCardResponse> {
         val recipes = recipeRepository.findPopularRecipes(limit)
-        for(recipe in recipes){
+        for (recipe in recipes) {
             recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
         }
         return recipes
     }
 
-    suspend fun findRecipesByDifficulty(limit: Int, difficulty: String, recipeImagesService: RecipeImagesService): List<RecipeCardResponse> {
+    suspend fun findRecipesByDifficulty(
+        limit: Int,
+        difficulty: String,
+        recipeImagesService: RecipeImagesService
+    ): List<RecipeCardResponse> {
         val recipes = recipeRepository.findRecipeCardsByDifficulty(limit, difficulty)
-        for(recipe in recipes){
+        for (recipe in recipes) {
             recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
         }
         return recipes
     }
+
     suspend fun findQuickRecipes(limit: Int, recipeImagesService: RecipeImagesService): List<RecipeCardResponse> {
         val recipes = recipeRepository.findQuickRecipes(limit)
-        for(recipe in recipes){
+        for (recipe in recipes) {
             recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
         }
         return recipes
     }
 
-    suspend fun findFavouriteRecipes(recipeIds: List<UserFavouritesEntry>, recipeImagesService: RecipeImagesService) : List<RecipeCardResponse>{
+    suspend fun findFavouriteRecipes(
+        recipeIds: List<UserFavouritesEntry>,
+        recipeImagesService: RecipeImagesService
+    ): List<RecipeCardResponse> {
         val recipes = recipeRepository.findFavoriteRecipes(recipeIds)
-        for(recipe in recipes){
+        for (recipe in recipes) {
             recipe.imageUrl.addAll(recipeImagesService.getImagesForRecipe(recipe.recipeId))
         }
         return recipes
     }
-
-    suspend fun createUploadedRecipe(
-        uploadedRecipe: RecipeUploadRequest,
-        recipeImagesService: RecipeImagesService,
-        recipeDietsService: RecipeDietsService,
-        recipeAllergenService: RecipeAllergenService,
-        ingredientUnitService: IngredientUnitService,
-
-    ) {
-        val recipe = RecipeEntry(
-            0,
-            uploadedRecipe.title,
-            uploadedRecipe.description,
-            uploadedRecipe.instructions,
-            uploadedRecipe.prepTime,
-            uploadedRecipe.cookingTime,
-            uploadedRecipe.difficulty,
-            uploadedRecipe.mealType,
-            uploadedRecipe.kitchenStyle,
-            0
-        )
-
-        val recipeImage = uploadedRecipe.images
-        val recipeDiets = uploadedRecipe.diets
-        val recipeAllergens = uploadedRecipe.allergens
-        val recipeIngredients = uploadedRecipe.ingredients
-
-        val newRecipe = addRecipes(recipe)
-
-
-        for (image in recipeImage) {
-            recipeImagesService.addImage(
-                newRecipe.id,
-                image.imageUrl
-            )
-        }
-
-        for (diets in recipeDiets) {
-            val newRecipeDiet = RecipeDietEntry(newRecipe.id, diets.id)
-            recipeDietsService.addRecipeDiet(newRecipeDiet)
-        }
-
-        for (allergens in recipeAllergens) {
-            val newRecipeAllergen = RecipeAllergenEntry(newRecipe.id, allergens.id)
-            recipeAllergenService.addRecipeAllergen(newRecipeAllergen)
-        }
-
-        for (ingredient in recipeIngredients) {
-            val newIngredientUnit = IngredientUnitEntry(newRecipe.id, ingredient.ingredientName, ingredient.amount,ingredient.unitType)
-            ingredientUnitService.addIngredientUnit(newIngredientUnit)
-        }
-    }
-
 }

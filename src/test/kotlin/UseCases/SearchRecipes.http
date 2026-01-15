@@ -1,3 +1,5 @@
+@auth_token = PASTE_YOUR_VALID_JWT_TOKEN_HERE
+
 ### Get all recipes
 GET http://localhost:8080/recipes
 
@@ -18,6 +20,7 @@ GET http://localhost:8080/recipes/kitchen/italian
 
 ### Find recipes by Ingredient names
 POST http://localhost:8080/recipes/ingredient
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -25,4 +28,24 @@ Content-Type: application/json
   "description": "A sweet substance",
   "allergens": [],
   "id": 2
+}
+
+### Upload a new recipe
+POST http://localhost:8080/recipes
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "My New Recipe",
+  "description": "A delicious test recipe",
+  "instructions": "Mix ingredients and cook.",
+  "prepTime": 15,
+  "cookingTime": 30,
+  "difficulty": "EASY",
+  "mealType": "DINNER",
+  "kitchenStyle": "ITALIAN",
+  "images": [],
+  "diets": [],
+  "allergens": [],
+  "ingredients": []
 }

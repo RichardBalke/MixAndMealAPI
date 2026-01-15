@@ -63,7 +63,13 @@ fun Application.configureKoin(){
         singleOf(::RecipeDietsRepositoryImpl) bind RecipeDietsRepository::class
         factory { RecipeDietsService(get()) }
         singleOf(::RecipesRepositoryImpl) bind RecipesRepository::class
-        factory { RecipeService(get()) }
+        factory {
+            RecipeService(
+                recipeRepository = get(),
+                dietsRepository = get(),
+                allergensRepository = get()
+            )
+        }
         singleOf(::UserAllergensRepositoryImpl) bind UserAllergensRepository::class
         factory { UserAllergensService(get()) }
         singleOf(::UserDietsRepositoryImpl) bind UserDietsRepository::class
