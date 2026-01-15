@@ -49,7 +49,7 @@ fun Route.fullRecipe() {
             val ingredients = ingredientUnitService.getIngredientsByRecipeId(id)
 
             val fullRecipe = FullRecipeScreenResponse(
-                recipe.id,
+                recipe.id?.toInt() ?: 0,
                 recipe.title,
                 recipe.description,
                 recipe.instructions,
@@ -94,7 +94,7 @@ fun Route.featuredRecipeDetails(){
             val recipe = recipeService.getRecipe(id) ?: return@get call.respond(HttpStatusCode.NotFound, "Recipe not found")
             val recipeImages = recipeImagesService.getImagesForRecipe(id).toMutableList()
             val response : RecipeCardResponse = RecipeCardResponse(
-                recipe.id,
+                recipe.id?.toInt() ?: 0,
                 recipe.title,
                 recipe.description,
                 recipe.cookingTime,

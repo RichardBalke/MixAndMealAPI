@@ -10,8 +10,7 @@ create table users
 
 create table recipes
 (
-    recipe_id    integer not null
-        primary key,
+    recipe_id    integer generated always AS identity primary key,
     title        varchar,
     description  varchar,
     instructions text,

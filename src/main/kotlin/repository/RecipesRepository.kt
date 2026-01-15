@@ -62,7 +62,7 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
     idColumns = listOf(Recipes.id),
     idExtractor =  { entry -> listOf(entry) },
     entityMapper = { stmt, recipe ->
-        stmt[Recipes.id] = recipe.id
+//        stmt[Recipes.id] = recipe.id?.toInt() ?: 0
         stmt[Recipes.title] = recipe.title
         stmt[Recipes.description] = recipe.description
         stmt[Recipes.instructions] = recipe.instructions

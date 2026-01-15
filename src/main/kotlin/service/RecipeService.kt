@@ -33,7 +33,7 @@ class RecipeService(
     ): Int {
         return newSuspendedTransaction {
             val recipe = RecipeEntry(
-                0,
+                null,
                 uploadedRecipe.title,
                 uploadedRecipe.description,
                 uploadedRecipe.instructions,
@@ -48,27 +48,27 @@ class RecipeService(
 
             // All service calls NOW work because they're inside transaction block
             uploadedRecipe.images.forEach { image ->
-                recipeImagesService.addImage(newRecipe.id, image.imageUrl)
+                recipeImagesService.addImage(newRecipe.id?.toInt() ?: 0 , image.imageUrl)
             }
 
             uploadedRecipe.diets.forEach { dietRequest ->
                 dietsRepository.findByDisplayName(dietRequest.displayName)?.let { diet ->
-                    recipeDietsService.addRecipeDiet(RecipeDietEntry(newRecipe.id, diet.id))
+                    recipeDietsService.addRecipeDiet(RecipeDietEntry(newRecipe.id?.toInt() ?: 0, diet.id))
                 }
             }
 
             uploadedRecipe.allergens.forEach { allergenRequest ->
                 allergensRepository.findByDisplayName(allergenRequest.displayName)?.let { allergen ->
-                    recipeAllergenService.addRecipeAllergen(RecipeAllergenEntry(newRecipe.id, allergen.id))
+                    recipeAllergenService.addRecipeAllergen(RecipeAllergenEntry(newRecipe.id?.toInt() ?: 0, allergen.id))
                 }
             }
 
             uploadedRecipe.ingredients.forEach { ingredient ->
                 ingredientUnitService.addIngredientUnit(
-                    IngredientUnitEntry(newRecipe.id, ingredient.ingredientName, ingredient.amount, ingredient.unitType)
+                    IngredientUnitEntry(newRecipe.id?.toInt() ?: 0, ingredient.ingredientName, ingredient.amount, ingredient.unitType)
                 )
             }
-            newRecipe.id
+            newRecipe.id?.toInt() ?: 0
         }
     }
 

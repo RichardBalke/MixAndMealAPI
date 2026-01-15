@@ -7,7 +7,7 @@ import models.enums.MealType
 
 @Serializable
 data class RecipeEntry(
-    val id: Int,
+    val id: Int?,
     val title: String,
     val description: String,
     val instructions: String,
