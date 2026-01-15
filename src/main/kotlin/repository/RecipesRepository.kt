@@ -18,6 +18,7 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.lowerCase
 import org.jetbrains.exposed.sql.orWhere
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -196,16 +197,26 @@ class RecipesRepositoryImpl : RecipesRepository, CrudImplementation<RecipeEntry,
     }
 
     override suspend fun searchRecipes(recipeSearchRequest: RecipeSearchRequest) : Set<RecipeCardResponse> = transaction {
-        val query = (Recipes innerJoin RecipeDiets innerJoin RecipeAllergens innerJoin IngredientUnits innerJoin RecipeImages)
+        val query = (Recipes leftJoin RecipeDiets leftJoin RecipeAllergens leftJoin IngredientUnits leftJoin RecipeImages)
             .selectAll()
-        recipeSearchRequest.partialTitle?.let {query.orWhere { Recipes.title eq it }}
-        recipeSearchRequest.difficulty?.let {query.orWhere { Recipes.difficulty eq it }}
-        recipeSearchRequest.mealType?.let {query.orWhere { Recipes.mealType eq it }}
-        recipeSearchRequest.kitchenStyle?.let {query.orWhere { Recipes.kitchenStyle eq it }}
+        recipeSearchRequest.partialTitle?.let { term ->
+            query.orWhere {
+                Recipes.title.lowerCase() like "%${term.lowercase()}%"
+            }
+        }
+        recipeSearchRequest.difficulty?.let {query.orWhere { Recipes.difficulty eq it.uppercase() }}
+        recipeSearchRequest.mealType?.let {query.orWhere { Recipes.mealType eq it.uppercase() }}
+        recipeSearchRequest.kitchenStyle?.let {query.orWhere { Recipes.kitchenStyle eq it.uppercase() }}
         recipeSearchRequest.maxCookingTime?.let {query.orWhere { Recipes.cookingTime lessEq it }}
-        recipeSearchRequest.diets.let {query.orWhere { RecipeDiets.dietId inList it }}
-        recipeSearchRequest.allergens.let {query.orWhere { RecipeAllergens.allergenId inList it }}
-        recipeSearchRequest.ingredients.let {query.orWhere { IngredientUnits.ingredientName inList it }}
+        if (recipeSearchRequest.diets.isNotEmpty()) {
+            query.orWhere { RecipeDiets.dietId inList recipeSearchRequest.diets }
+        }
+        if(recipeSearchRequest.allergens.isNotEmpty()) {
+            recipeSearchRequest.allergens.let { query.orWhere { RecipeAllergens.allergenId inList it } }
+        }
+        if(recipeSearchRequest.ingredients.isNotEmpty()) {
+            recipeSearchRequest.ingredients.let { query.orWhere { IngredientUnits.ingredientName inList it } }
+        }
 
             query.map{
                 RecipeCardResponse(

@@ -11,8 +11,8 @@ GET http://localhost:8080/search-recipes
 Content-Type: application/json
 
 {
-  "partialTitle": "Vegetable Stir Fry",
-  "difficulty": null,
+  "partialTitle": null,
+  "difficulty": "easy",
   "mealType": null,
   "kitchenStyle": null,
   "maxCookingTime": null,
