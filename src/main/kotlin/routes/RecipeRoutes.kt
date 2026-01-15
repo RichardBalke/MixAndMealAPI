@@ -150,6 +150,22 @@ fun Route.quickRecipes(){
     }
 }
 
+fun Route.recipeSearch(){
+    val recipeService by inject<RecipeService>()
+    route("/search-recipes"){
+        get(){
+            val request = call.receive<RecipeSearchRequest>()
+            val recipes = recipeService.searchRecipes(request)
+            if(recipes.isNotEmpty()){
+                call.respond(HttpStatusCode.OK, recipes)
+            }
+            else{
+                call.respond(HttpStatusCode.NotFound, listOf<RecipeCardResponse>())
+            }
+        }
+    }
+}
+
 fun Route.recipesRoutes() {
     val recipeService by inject<RecipeService>()
     val recipeImagesService by inject<RecipeImagesService>()
