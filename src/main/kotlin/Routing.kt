@@ -1,5 +1,6 @@
 package api
 
+import api.routes.deleteRecipe
 import api.routes.dietRoutes
 import api.routes.featuredRecipeDetails
 import api.routes.fullRecipe
@@ -38,6 +39,7 @@ fun Application.configureRouting(
         uploadRecipe()
         quickRecipes()
         recipeSearch()
+        deleteRecipe()
 
         // Users
         userRoutes()

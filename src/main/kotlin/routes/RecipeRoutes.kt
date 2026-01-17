@@ -2,6 +2,7 @@ package api.routes
 
 import api.repository.IngredientUnitRepositoryImpl
 import api.repository.RecipesRepositoryImpl
+import api.requests.RecipeIDRequest
 import api.requests.RecipeUploadRequest
 import api.responses.RecipeCardResponse
 import io.ktor.http.HttpStatusCode
@@ -151,6 +152,41 @@ fun Route.recipeSearch(){
             }
             else{
                 call.respond(HttpStatusCode.NotFound, listOf<RecipeCardResponse>())
+            }
+        }
+    }
+}
+
+fun Route.deleteRecipe(){
+    val recipeService by inject<RecipeService>()
+    val recipeImagesService by inject<RecipeImagesService>()
+    val recipeDietsService by inject<RecipeDietsService>()
+    val recipeAllergenService by inject<RecipeAllergenService>()
+    val ingredientUnitService by inject<IngredientUnitService>()
+    route("/delete-recipe") {
+        authenticate {
+            delete {
+                val isAdmin = call.requireAdmin()
+                if (isAdmin){
+                    val id = call.receive<RecipeIDRequest>().recipeId
+                    val check = mutableListOf<Boolean>()
+                    check.add(recipeImagesService.deleteAllRecipeImages(id))
+                    check.add(recipeDietsService.deleteAllRecipeDiets(id))
+                    check.add(recipeAllergenService.deleteAllRecipeAllergens(id))
+                    check.add(ingredientUnitService.deleteAllRecipeIngredients(id))
+                    check.add(recipeService.deleteRecipe(id))
+
+                    if(!check.any()){
+                        call.respond(HttpStatusCode.InternalServerError, "We could not delete the recipe")
+                    }
+                    else{
+                        call.respond(HttpStatusCode.OK, "recipe is deleted")
+                    }
+
+                }
+                else{
+                    call.respond(HttpStatusCode.Unauthorized)
+                }
             }
         }
     }
@@ -308,24 +344,13 @@ fun Route.uploadRecipe() {
         )
         // Upload images via your SFTP service
         for(uploadedImage in imageFiles) {
-            recipeImagesService.uploadImage(id, uploadedImage.first, uploadedImage.second)
-        }
-
-        var fileBytes: ByteArray? = null
-        var fileName: String? = null
-
-        multipart.forEachPart { part ->
-            if (part is PartData.FileItem) {
-                fileName = part.originalFileName ?: "image_${System.currentTimeMillis()}.jpg"
-                fileBytes = part.streamProvider().readBytes()
+            if (uploadedImage.toList().isEmpty()) {
+                call.respond(HttpStatusCode.BadRequest, "No file uploaded")
+                return@post
             }
-            part.dispose()
-        }
-
-        if (fileBytes == null || fileName == null) {
-            call.respond(HttpStatusCode.BadRequest, "No file uploaded")
-            return@post
-        }
+            else{
+            recipeImagesService.uploadImage(id, uploadedImage.first, uploadedImage.second)
+        }}
 
         call.respond(HttpStatusCode.Created, RecipeResponse(id))
 
