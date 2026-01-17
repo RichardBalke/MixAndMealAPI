@@ -11,13 +11,14 @@ import models.enums.MealType
 
 @Serializable
 data class RecipeUploadRequest(
+    val recipeId: Int?,
     val title: String,
     val description: String,
     val instructions: String,
     val prepTime: Int,
     val cookingTime: Int,
     val difficulty: Difficulty,
-    val images: List<RecipeImageEntry>,
+//    val images: List<RecipeImageEntry>,
     val mealType: MealType,
     val kitchenStyle: KitchenStyle,
     val diets: List<DietEntry>,
