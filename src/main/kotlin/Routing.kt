@@ -10,7 +10,6 @@ import api.routes.quickRecipes
 import api.routes.recipeCardsByDifficulty
 import api.routes.recipeSearch
 import api.routes.userRoutes
-import api.routes.recipesRoutes
 import api.routes.uploadRecipe
 import api.routes.userFridgeRoutes
 import io.ktor.server.application.*
@@ -32,7 +31,6 @@ fun Application.configureRouting(
     routing {
         // Recipes
         featuredRecipeDetails()
-        recipesRoutes()
         fullRecipe()
         popularRecipes()
         recipeCardsByDifficulty()
