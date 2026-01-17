@@ -1,6 +1,8 @@
 package service
 
+import api.service.ByteArraySourceFile
 import models.dto.RecipeImageEntry
+import net.schmizz.sshj.SSHClient
 import repository.RecipeImageRepository
 
 class RecipeImagesService(private val recipeImageRepository: RecipeImageRepository) {
@@ -15,5 +17,26 @@ class RecipeImagesService(private val recipeImageRepository: RecipeImageReposito
 
     suspend fun deleteImage(imageId: Int) {
         recipeImageRepository.deleteImage(imageId)
+    }
+
+    suspend fun uploadImage(recipeId:Int, fileName: String, bytes: ByteArray): RecipeImageEntry {
+        val ssh = SSHClient().apply {
+            connect("ssh.cyz59nsua.service.one")              // SFTP host = your domain
+            authPassword("", "")
+        }
+
+        val source = ByteArraySourceFile(fileName, bytes)
+
+        val sftp = ssh.newSFTPClient()
+        try {
+            val remotePath = "/webroots/18c388e7/mix-and-meal/$fileName"
+            sftp.put(source, remotePath)
+        } finally {
+            sftp.close()
+        }
+        ssh.disconnect()
+        val publicUrl = "https://yourdomain.com/uploads/$fileName"
+
+        return addImage(recipeId , publicUrl)
     }
 }
