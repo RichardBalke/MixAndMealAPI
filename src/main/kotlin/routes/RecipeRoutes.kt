@@ -18,6 +18,12 @@ import models.dto.RecipeEntry
 import org.koin.ktor.ext.inject
 import repository.AllergensRepository
 import api.responses.RecipeResponse
+import api.service.ByteArraySourceFile
+import io.ktor.http.content.PartData
+import io.ktor.http.content.forEachPart
+import io.ktor.http.content.streamProvider
+import io.ktor.server.request.receiveMultipart
+import net.schmizz.sshj.SSHClient
 import repository.DietsRepository
 import requests.RecipeSearchRequest
 import responses.FullRecipeScreenResponse
@@ -29,6 +35,7 @@ import service.RecipeDietsService
 import service.RecipeImagesService
 import service.RecipeService
 import service.requireAdmin
+import java.io.ByteArrayInputStream
 
 fun Route.fullRecipe() {
     route("/fullrecipe") {
@@ -67,23 +74,6 @@ fun Route.fullRecipe() {
         }
     }
 }
-
-//fun Route.recipeSearchResults(recipeService: RecipeService){
-//    route("recipe/search"){
-//        post(){
-//            val request = call.receive<RecipeSearchRequest>()
-//            val recipes = recipeService.searchRecipes(request)
-//
-//            if(recipes.isEmpty()){
-//                call.respond(HttpStatusCode.NoContent, "No recipes found")
-//            }
-//            else{
-//                call.respond(HttpStatusCode.OK, recipes)
-//            }
-//
-//        }
-//    }
-//}
 
 fun Route.featuredRecipeDetails(){
     route("/recipes/featured"){
@@ -212,7 +202,7 @@ fun Route.recipesRoutes() {
                 val newRecipe = call.receive<RecipeUploadRequest>()
                 val id = recipeService.createUploadedRecipe(
                     newRecipe,
-                    recipeImagesService,
+//                    recipeImagesService,
                     recipeDietsService,
                     recipeAllergenService,
                     ingredientUnitService
@@ -268,7 +258,7 @@ fun Route.uploadRecipe() {
                 val newRecipe = call.receive<RecipeUploadRequest>()
                 val id = recipeService.createUploadedRecipe(
                     newRecipe,
-                    recipeImagesService,
+//                    recipeImagesService,
                     recipeDietsService,
                     recipeAllergenService,
                     ingredientUnitService
@@ -277,4 +267,68 @@ fun Route.uploadRecipe() {
             }
         }
 //    }
+
+    post("/update-recipe") {
+        val multipart = call.receiveMultipart()
+        var recipeJson: String? = null
+        val imageFiles = mutableListOf<Pair<String, ByteArray>>() // (filename, bytes)
+
+        multipart.forEachPart { part ->
+            when (part) {
+
+                is PartData.FormItem -> {
+                    if (part.name == "recipe") {
+                        recipeJson = part.value
+                    }
+                }
+
+                is PartData.FileItem -> {
+                    val fileName = part.originalFileName ?: "image_${System.currentTimeMillis()}.jpg"
+                    val bytes = part.streamProvider().readBytes()
+                    imageFiles += fileName to bytes
+                }
+                else -> part.dispose()
+            }
+            part.dispose()
+        }
+
+        if (recipeJson == null) {
+            call.respond(HttpStatusCode.BadRequest, "Missing recipe JSON")
+            return@post
+        }
+
+        val newRecipe = kotlinx.serialization.json.Json.decodeFromString<RecipeUploadRequest>(recipeJson!!)
+
+        // Create recipe with images
+        val id = recipeService.createUploadedRecipe(
+            newRecipe,
+            recipeDietsService,
+            recipeAllergenService,
+            ingredientUnitService
+        )
+        // Upload images via your SFTP service
+        for(uploadedImage in imageFiles) {
+            recipeImagesService.uploadImage(id, uploadedImage.first, uploadedImage.second)
+        }
+
+        var fileBytes: ByteArray? = null
+        var fileName: String? = null
+
+        multipart.forEachPart { part ->
+            if (part is PartData.FileItem) {
+                fileName = part.originalFileName ?: "image_${System.currentTimeMillis()}.jpg"
+                fileBytes = part.streamProvider().readBytes()
+            }
+            part.dispose()
+        }
+
+        if (fileBytes == null || fileName == null) {
+            call.respond(HttpStatusCode.BadRequest, "No file uploaded")
+            return@post
+        }
+
+        call.respond(HttpStatusCode.Created, RecipeResponse(id))
+
+    }
+
 }
