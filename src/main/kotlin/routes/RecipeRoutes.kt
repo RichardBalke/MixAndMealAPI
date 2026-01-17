@@ -201,19 +201,19 @@ fun Route.uploadRecipe() {
     val ingredientUnitService by inject<IngredientUnitService>()
 
 //    authenticate {
-        route("/upload-recipe") {
-            post {
-                val newRecipe = call.receive<RecipeUploadRequest>()
-                val id = recipeService.createUploadedRecipe(
-                    newRecipe,
-//                    recipeImagesService,
-                    recipeDietsService,
-                    recipeAllergenService,
-                    ingredientUnitService
-                )
-                call.respond(HttpStatusCode.Created, RecipeResponse(id))
-            }
-        }
+//        route("/upload-recipe") {
+//            post {
+//                val newRecipe = call.receive<RecipeUploadRequest>()
+//                val id = recipeService.createUploadedRecipe(
+//                    newRecipe,
+////                    recipeImagesService,
+//                    recipeDietsService,
+//                    recipeAllergenService,
+//                    ingredientUnitService
+//                )
+//                call.respond(HttpStatusCode.Created, RecipeResponse(id))
+//            }
+//        }
 //    }
     route("/update-recipe") {
         post {
