@@ -6,7 +6,9 @@ import models.dto.RecipeDietEntry
 import models.dto.RecipeImageEntry
 import models.tables.RecipeDiets
 import models.tables.RecipeImages
+import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -37,13 +39,14 @@ class RecipeDietsRepositoryImpl() : CrudImplementation<RecipeDietEntry, RecipeDi
     }
 
     override suspend fun deleteDietsByRecipeId(recipeId: Int): Int = transaction {
-        table.deleteWhere { RecipeImages.recipeId eq recipeId }
+        RecipeDiets.deleteWhere{RecipeDiets.recipeId eq recipeId}
     }
+
 
     override suspend fun getDietsForRecipe(recipeId: Int): List<RecipeDietEntry> = transaction {
         table
             .selectAll()
-            .where(RecipeImages.recipeId eq recipeId)
+            .where(RecipeDiets.recipeId eq recipeId)
             .map(toEntity)
             .toList()
     }

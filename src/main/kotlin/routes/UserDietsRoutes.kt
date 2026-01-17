@@ -1,5 +1,6 @@
 package routes
 
+import api.requests.RecipeIDRequest
 import api.responses.RecipeCardResponse
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -15,11 +16,20 @@ import io.ktor.server.auth.principal
 import models.dto.DietEntry
 import org.koin.ktor.ext.inject
 import service.DietsService
+import service.RecipeDietsService
 
 fun Route.userDietsRoutes() {
     val userDietsService by inject<UserDietsService>()
     val dietsService by inject<DietsService>()
+    val recipeDietsService by inject<RecipeDietsService>()
 
+    route("delete-diet"){
+        post{
+            val id = call.receive<RecipeIDRequest>().recipeId
+            val check = recipeDietsService.deleteAllRecipeDiets(id)
+            call.respond(HttpStatusCode.OK, check)
+        }
+    }
     authenticate {
         route("/user-diets") {
             get() {

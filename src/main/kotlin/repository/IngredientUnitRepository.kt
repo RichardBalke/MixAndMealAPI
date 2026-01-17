@@ -70,6 +70,6 @@ class IngredientUnitRepositoryImpl() : IngredientUnitRepository,
     }
 
     override suspend fun deleteIngredientsByRecipeId(recipeId: Int): Int = transaction {
-        table.deleteWhere { RecipeImages.recipeId eq recipeId }
+        table.deleteWhere { IngredientUnits.recipeId eq recipeId }
     }
 }

@@ -45,7 +45,7 @@ class RecipeAllergensRepositoryImpl() : CrudImplementation<RecipeAllergenEntry, 
     }
 
     override suspend fun deleteDietsByRecipeId(recipeId: Int): Int = transaction {
-        table.deleteWhere { RecipeImages.recipeId eq recipeId }
+        table.deleteWhere { RecipeAllergens.recipeId eq recipeId }
     }
 
 }
